@@ -1,21 +1,30 @@
 - main:
-  - heading "Welcome to Electron" [level=1]
-  - link "Vite logo":
-    - /url: https://vite.dev
-    - img "Vite logo"
-  - link "Electron logo":
-    - /url: https://www.electronjs.org
-    - img "Electron logo"
-  - link "typescript logo":
-    - /url: https://www.typescriptlang.org/docs
-    - img "typescript logo"
-  - paragraph: Click on the Electron logo to learn more about the framework
-  - form "Greet":
-    - textbox "Name":
-      - /placeholder: Enter a name...
-    - button "Greet"
-    - button "Clear"
-  - paragraph
-  - text: "backend:"
-  - strong: mock
-  - text: "platform: mock / mock"
+  - heading "Tally" [level=1]
+  - paragraph: Your money, kept local.
+  - text: mock
+  - navigation "Workspace":
+    - button "Transactions"
+  - status: All changes saved on this device
+  - paragraph: YOUR LEDGER
+  - heading "Transactions" [level=2]
+  - text: 0 recorded
+  - heading "Add transaction" [level=3]
+  - form "Add transaction":
+    - text: Date
+    - textbox "Date": /\d+-\d+-\d+/
+    - text: Payee
+    - textbox "Payee":
+      - /placeholder: Where did it go?
+    - text: Amount
+    - textbox "Amount":
+      - /placeholder: "-12.34"
+    - text: Spending − · income + Category (optional)
+    - combobox "Category (optional)"
+    - text: Note (optional)
+    - textbox "Note (optional)"
+    - button "Save transaction"
+  - heading "Your transactions" [level=3]
+  - paragraph: No transactions yet
+  - text: Add your first transaction above.
+  - group: Settings
+  - text: mock / mock

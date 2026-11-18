@@ -3,6 +3,9 @@
 // is the one engine; CI runs it on all three OS runners.
 import { defineConfig, devices } from "@playwright/test";
 
+const TEST_SERVER_PORT = 21427;
+const TEST_SERVER_URL = `http://localhost:${TEST_SERVER_PORT}`;
+
 export default defineConfig({
   testDir: "tests/ui",
   fullyParallel: true,
@@ -22,7 +25,7 @@ export default defineConfig({
     },
   },
   use: {
-    baseURL: "http://localhost:1420",
+    baseURL: TEST_SERVER_URL,
     viewport: { width: 1024, height: 700 },
     deviceScaleFactor: 1,
     trace: "retain-on-failure",
@@ -32,9 +35,9 @@ export default defineConfig({
     { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 700 } } },
   ],
   webServer: {
-    command: "npm run dev:web -- --strictPort --port 1420",
-    url: "http://localhost:1420",
-    reuseExistingServer: !process.env.CI,
+    command: `npm run dev:web -- --strictPort --port ${TEST_SERVER_PORT}`,
+    url: TEST_SERVER_URL,
+    reuseExistingServer: false,
     timeout: 60_000,
   },
 });

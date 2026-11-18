@@ -24,8 +24,9 @@ levels must be green on every Tier 1 platform before a row becomes done.
 - Planning: Ruling: release bug hunt may use one fresh reader as keel-release explicitly requires; implementation remains solo â€” independent review catches shared author/test assumptions â€” cost if wrong: review overhead only.
 <!-- keel:end -->
 
-Ruling: pin macOS CI to macos-15 and assert arm64 in the real shell — macos-latest remained queued while other runners finished — cost if wrong: the architecture assertion fails and the runner must be revised.
+Ruling: pin macOS CI to macos-15 and assert arm64 in the real shell  -  macos-latest remained queued while other runners finished  -  cost if wrong: the architecture assertion fails and the runner must be revised.
 
-Ruling: prepare later slices on isolated branches while macOS hosted jobs queue; do not mark scaffold or any slice done until its Tier 1 evidence exists — all macOS label probes remain queued — cost if wrong: prepared work waits unmerged for the scaffold gate.
+Ruling: prepare later slices on isolated branches while macOS hosted jobs queue; do not mark scaffold or any slice done until its Tier 1 evidence exists  -  all macOS label probes remain queued  -  cost if wrong: prepared work waits unmerged for the scaffold gate.
 
-Ruling: combine L0-L6 commands in one hosted job per Tier 1 OS — repeated macOS job startup/queue dominates runtime — cost if wrong: a failure stops later levels on that OS until fixed; all three remain required.
+Ruling: sample greeting UI tests retire with the deliberately replaced scaffold UI; shared greeting contract stays until the next PR, while sandbox/platform tests remain and real CRUD/restart replace sample interactions  -  slice 1 replaces the greeting by design  -  cost if wrong: sample-only behavior is no longer exercised in the renderer.
+Ruling: combine L0-L6 commands in one hosted job per Tier 1 OS  -  repeated macOS job startup/queue dominates runtime  -  cost if wrong: a failure stops later levels on that OS until fixed; all three remain required.

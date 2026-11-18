@@ -2,20 +2,24 @@
 // `npm run build`) with Electron itself and drives its first window.
 // Everything here crosses the preload bridge and IPC to the main process,
 // which no browser-mode test can do.
-import { _electron as electron, expect, test, type ElectronApplication, type Page } from "@playwright/test";
+import { expect, test, type ElectronApplication, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { greeting } from "../../contracts/greet";
+import { emptyLedger } from "../../contracts/ledger";
+import { launchLedger, removeTemporaryDirectory, temporaryDirectory } from "./helpers";
 
 let app: ElectronApplication;
 let win: Page;
 const consoleErrors: string[] = [];
+let directory: string;
 
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
-  app = await electron.launch({ args: ["."], cwd: process.cwd() });
-  win = await app.firstWindow();
+  directory = await temporaryDirectory();
+  const shell = await launchLedger(directory);
+  app = shell.app;
+  win = shell.page;
   win.on("console", (m) => {
     if (m.type() === "error") consoleErrors.push(m.text());
   });
@@ -24,6 +28,7 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await app?.close();
+  await removeTemporaryDirectory(directory);
 });
 
 test.describe("tally in the real shell", () => {
@@ -34,8 +39,8 @@ test.describe("tally in the real shell", () => {
     const title = /<title>(.*?)<\/title>/.exec(html)?.[1];
     expect(title).toBeTruthy();
     await expect(win).toHaveTitle(title!);
-    await expect(win.locator("h1")).toHaveText("Welcome to Electron");
-    await expect(win.locator("#greet-input")).toBeVisible();
+    await expect(win.locator("h1")).toHaveText("Tally");
+    await expect(win.getByLabel("Payee", { exact: true })).toBeVisible();
     // The badge proves the UI is talking to the main process, not the mock.
     await expect(win.getByTestId("backend-badge")).toHaveText("native");
     // contextIsolation and the sandbox: the page sees the bridge, not Node.
@@ -48,9 +53,8 @@ test.describe("tally in the real shell", () => {
   });
 
   test("round-trips a call to the main process and matches the shared contract", async () => {
-    await win.locator("#greet-input").fill("Keel");
-    await win.locator("#greet-form button[type=submit]").click();
-    await expect(win.locator("#greet-msg")).toHaveText(greeting("Keel"));
+    const snapshot = await win.evaluate(() => window.electronBridge!.snapshot());
+    expect(snapshot).toEqual({ ledger: emptyLedger(), canUndo: false });
   });
 
   test("reports the platform from the main process and saves a screenshot named after it", async () => {
