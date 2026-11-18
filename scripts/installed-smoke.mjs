@@ -7,6 +7,8 @@ if (!executable) throw new Error("Usage: node scripts/installed-smoke.mjs <insta
 const artifacts = resolve("artifacts/l7");
 await mkdir(artifacts, { recursive: true });
 const directory = await mkdtemp(join(artifacts, `${process.platform}-`));
+const cleanupTarget = resolve(directory);
+if (!cleanupTarget.startsWith(artifacts + sep)) throw new Error("Refusing cleanup outside L7 artifacts");
 const ledgerFile = join(directory, "ledger.json");
 const fixture = JSON.parse(await readFile("tests/fixtures/install-ledger.json", "utf8"));
 await writeFile(ledgerFile, JSON.stringify(fixture), { mode: 0o600 });
@@ -43,7 +45,5 @@ try {
   console.log("Installed app preserved a saved record and reopened a newly saved transaction");
 } finally {
   await application?.close();
-  const target = resolve(directory);
-  if (!target.startsWith(artifacts + sep)) throw new Error("Refusing cleanup outside L7 artifacts");
-  await rm(target, { recursive: true, force: true });
+  await rm(cleanupTarget, { recursive: true, force: true });
 }
