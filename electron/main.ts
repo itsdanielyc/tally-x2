@@ -1,72 +1,66 @@
-// The main process: the "backend" of this app, the way Rust is in the Tauri
-// template. It answers the bridge's IPC calls. The greeting is implemented
-// here on its own, not imported from contracts/, so the real-shell suite
-// (tests/e2e) is what holds it to the contract.
-import { app, BrowserWindow, ipcMain, shell } from "electron";
-import { join } from "node:path";
+import { app, BrowserWindow, ipcMain, session, type IpcMainInvokeEvent } from "electron";
+import { mkdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { channels, type PlatformInfo } from "./bridge";
-import { emptyLedger } from "../contracts/ledger";
-import { decodeLedger, validateCommand } from "../contracts/validation";
+import { LedgerService } from "../backend/service";
+import { FileLedgerStore } from "../persistence/file-store";
+import { validateCommand } from "../contracts/validation";
 
-function greet(name: string): string {
-  return `Hello, ${name}! You've been greeted from the main process!`;
+let primaryWindow: BrowserWindow | undefined;
+const dataDirectory = process.env.TALLY_DATA_DIR;
+if (dataDirectory) { mkdirSync(resolve(dataDirectory), { recursive: true }); app.setPath("userData", resolve(dataDirectory)); }
+
+/** Only our sandboxed window may invoke the application command surface. */
+function assertSender(event: IpcMainInvokeEvent): void {
+  if (event.sender !== primaryWindow?.webContents || event.senderFrame !== event.sender.mainFrame) throw new Error("Untrusted IPC sender");
 }
 
 function platformInfo(): PlatformInfo {
-  return {
-    os: process.platform,
-    arch: process.arch,
-    electron: process.versions.electron,
-    packaged: app.isPackaged,
-  };
+  return { os: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged };
+}
+
+/** The desktop app is offline; only the local development server is exempt. */
+function configureSession(): void {
+  const developmentUrl = !app.isPackaged ? process.env.ELECTRON_RENDERER_URL : undefined;
+  session.defaultSession.webRequest.onBeforeRequest((request, callback) => {
+    const localDevelopment = developmentUrl && new URL(request.url).origin === new URL(developmentUrl).origin;
+    callback({ cancel: !request.url.startsWith("file:") && !localDevelopment });
+  });
+  session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+  session.defaultSession.setPermissionCheckHandler(() => false);
+  session.defaultSession.on("will-download", (event) => event.preventDefault());
 }
 
 function createWindow(): void {
-  const win = new BrowserWindow({
-    width: 1024,
-    height: 700,
-    title: "Tally",
-    show: false,
-    webPreferences: {
-      preload: join(import.meta.dirname, "../preload/preload.cjs"),
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true,
-    },
+  const window = new BrowserWindow({
+    width: 1100, height: 780, minWidth: 760, minHeight: 600, title: "Tally", show: false,
+    webPreferences: { preload: join(import.meta.dirname, "../preload/preload.cjs"), contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
-  win.once("ready-to-show", () => win.show());
-  // Links open in the system browser, never inside the app window.
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith("https://")) void shell.openExternal(url);
-    return { action: "deny" };
-  });
-
-  const devUrl = process.env.ELECTRON_RENDERER_URL;
-  if (!app.isPackaged && devUrl) void win.loadURL(devUrl);
-  else void win.loadFile(join(import.meta.dirname, "../renderer/index.html"));
+  primaryWindow = window;
+  window.once("ready-to-show", () => window.show());
+  window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  window.webContents.on("will-navigate", (event) => event.preventDefault());
+  const developmentUrl = process.env.ELECTRON_RENDERER_URL;
+  if (!app.isPackaged && developmentUrl) void window.loadURL(developmentUrl);
+  else void window.loadFile(join(import.meta.dirname, "../renderer/index.html"));
 }
 
 function start(): void {
-  ipcMain.handle(channels.snapshot, () => ({ ledger: decodeLedger(emptyLedger()), canUndo: false }));
-  ipcMain.handle(channels.execute, (_event, command: unknown) => {
-    validateCommand(command);
-    throw new Error("Ledger storage is not connected yet");
+  configureSession();
+  const ledger = new LedgerService(new FileLedgerStore(join(app.getPath("userData"), "ledger.json")));
+  ipcMain.handle(channels.snapshot, (event) => { assertSender(event); return ledger.snapshot(); });
+  ipcMain.handle(channels.execute, (event, command: unknown) => { assertSender(event); return ledger.execute(validateCommand(command)); });
+  ipcMain.handle(channels.platformInfo, (event) => { assertSender(event); return platformInfo(); });
+  ipcMain.handle(channels.greet, (event, name: unknown) => {
+    assertSender(event);
+    return `Hello, ${String(name)}! You've been greeted from the main process!`;
   });
-  ipcMain.handle(channels.greet, (_e, name: unknown) => greet(String(name)));
-  ipcMain.handle(channels.platformInfo, () => platformInfo());
   createWindow();
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+  app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 }
 
-// A main process that cannot start has nothing to show the error in: log it
-// and exit non-zero so the real-shell suite and the installer test both fail.
-app.whenReady().then(start).catch((error: unknown) => {
-  console.error(error);
-  app.exit(1);
-});
+if (app.requestSingleInstanceLock()) {
+  app.whenReady().then(start).catch((error: unknown) => { console.error(error); app.exit(1); });
+} else app.quit();
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
-});
+app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });

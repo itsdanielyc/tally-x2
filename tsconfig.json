@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "contracts"]
+  "include": ["src", "contracts", "domain", "backend"]
 }

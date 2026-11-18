@@ -6,8 +6,9 @@
 // a UI test that passes against the mock means something.
 import type { ElectronBridge, PlatformInfo } from "../electron/bridge";
 import { greeting } from "../contracts/greet";
-import { emptyLedger, type LedgerApi } from "../contracts/ledger";
-import { decodeLedger, validateCommand } from "../contracts/validation";
+import type { LedgerApi } from "../contracts/ledger";
+import { LedgerService } from "../backend/service";
+import { memoryStore } from "../backend/ports";
 
 export interface Backend extends LedgerApi {
   readonly kind: "native" | "mock";
@@ -23,9 +24,11 @@ declare global {
 
 const bridge = typeof window !== "undefined" ? window.electronBridge : undefined;
 
+const mockLedger = new LedgerService(memoryStore());
+
 export const mock: Backend = {
-  snapshot: async () => ({ ledger: decodeLedger(emptyLedger()), canUndo: false }),
-  execute: async (command) => { validateCommand(command); throw new Error("Ledger storage is not connected yet"); },
+  snapshot: () => mockLedger.snapshot(),
+  execute: (command) => mockLedger.execute(command),
   kind: "mock",
   greet: async (name) => greeting(name),
   platformInfo: async () => ({
