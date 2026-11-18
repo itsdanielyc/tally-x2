@@ -1,0 +1,10 @@
+{
+  "keel": 1,
+  "name": "tally",
+  "profile": "electron-web",
+  "platforms": {
+    "tier1": ["windows-x64", "macos-arm64", "linux-x64"],
+    "tier2": [],
+    "tier3": []
+  }
+}
