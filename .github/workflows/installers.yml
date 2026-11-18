@@ -7,6 +7,7 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: installers-${{ github.ref }}
@@ -46,6 +47,8 @@ jobs:
       - run: npm ci
       - name: Build and package (nsis | dmg | deb + AppImage)
         run: npm run package
+      - name: Bundle checksums
+        run: node scripts/checksums.mjs
       - name: Install, launch, uninstall (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -68,5 +71,14 @@ jobs:
             release/*.dmg
             release/*.deb
             release/*.AppImage
+            release/SHA256SUMS-*.txt
           if-no-files-found: warn
           retention-days: 7
+      - name: Upload installed-app evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: installed-${{ matrix.os }}
+          path: artifacts/l7/*.png
+          if-no-files-found: warn
+          retention-days: 14

@@ -31,6 +31,8 @@ function Smoke-Launch($exe) {
   Stop-Installed (Split-Path $exe)
   Start-Sleep -Seconds 2
   Assert $alive "installed app launched and stayed alive for 6s ($exe)"
+  & node (Join-Path $PSScriptRoot "installed-smoke.mjs") $exe
+  Assert ($LASTEXITCODE -eq 0) "installed app preserves and reopens its ledger"
 }
 
 $setup = Get-ChildItem "$bundle\*-setup.exe" | Select-Object -First 1

@@ -16,6 +16,8 @@ Implement the seven fixed slices in PLAN.md, solo, in sequence. No new scope.
 - L4-L5: `npm run test:ui`, labelled browser mock.
 - L6: `npm run build`, then `npm run test:e2e`.
 - L7: `npm run package`, hosted `installers` workflow.
+- Version gate: `npm run check:version` (also part of lint).
+- Pre-tag gate: `npm run check:release -- <candidate-sha>`; no tag in this run.
 - CI digest: `npm run triage -- <run-id>`.
 - Real-app instructions: `.agents/skills/verify-tally/SKILL.md`.
 

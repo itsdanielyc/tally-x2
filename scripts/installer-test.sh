@@ -40,6 +40,7 @@ case "$(uname -s)" in
     hdiutil detach "$mnt" >/dev/null; ok "dmg copied to $dest and detached"
     xattr -cr "$dest/tally.app" || true
     smoke_launch "open -n '$dest/tally.app'" "$dest/tally.app/Contents/MacOS/tally"
+    node "$here/installed-smoke.mjs" "$dest/tally.app/Contents/MacOS/tally"
     rm -rf "$dest/tally.app"; ok "app removed"
     ;;
   Linux)
@@ -48,11 +49,13 @@ case "$(uname -s)" in
     sudo apt-get install -y "$deb" >/dev/null; ok "deb installed"
     command -v tally >/dev/null || fail "tally not on PATH after deb install"
     smoke_launch "tally" "/opt/tally/tally"
+    node "$here/installed-smoke.mjs" /opt/tally/tally
     sudo apt-get remove -y tally >/dev/null; ok "deb removed"
     command -v tally >/dev/null && fail "tally still on PATH after removal" || ok "tally gone from PATH"
     appimage=$(ls "$bundle"/*.AppImage | head -1); [ -f "$appimage" ] || fail "no AppImage"
     chmod +x "$appimage"
     smoke_launch "'$appimage' --appimage-extract-and-run" "appimage_extracted_.*/tally"
+    node "$here/installed-smoke.mjs" "$appimage" --appimage-extract-and-run
     ;;
   *) fail "unsupported OS" ;;
 esac
