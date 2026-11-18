@@ -21,6 +21,6 @@ export function applyTransactionCommand(ledger: Ledger, command: LedgerCommand, 
 }
 
 /** Time O(n log n), space O(n): newest dates first, stable entry order for ties. */
-export function newestFirst(transactions: Transaction[]): Transaction[] {
-  return [...transactions].sort((left, right) => right.date.localeCompare(left.date));
+export function newestFirst(transactions: Transaction[], matches: (transaction: Transaction) => boolean = () => true): Transaction[] {
+  return transactions.filter(matches).sort((left, right) => right.date.localeCompare(left.date));
 }

@@ -1,0 +1,61 @@
+- main:
+  - heading "Tally" [level=1]
+  - paragraph: Your money, kept local.
+  - text: mock
+  - navigation "Workspace":
+    - button "Transactions"
+    - button "Import CSV"
+    - button "Categories"
+    - button "Monthly summary"
+  - status: Monthly budget saved
+  - button "Undo" [disabled]
+  - paragraph: THE MONTH AT A GLANCE
+  - heading "Monthly summary" [level=2]
+  - button "Previous month"
+  - text: Month
+  - textbox "Month": /\d+-\d+/
+  - button "Next month"
+  - heading "Income" [level=3]
+  - strong: /GBP \d+\.\d+/
+  - heading "Spending" [level=3]
+  - strong: /GBP \d+\.\d+/
+  - heading "Net" [level=3]
+  - strong: /GBP \d+\.\d+/
+  - heading "Category totals" [level=3]
+  - paragraph: 2 transactions this month. Budgets compare gross spending; positive amounts are income.
+  - table /Category totals for \d+-\d+/:
+    - caption: /Category totals for \d+-\d+/
+    - rowgroup:
+      - row "Category Income Spending Net Monthly budget Left / over":
+        - columnheader "Category"
+        - columnheader "Income"
+        - columnheader "Spending"
+        - columnheader "Net"
+        - columnheader "Monthly budget"
+        - columnheader "Left / over"
+    - rowgroup:
+      - row /Food GBP \d+\.\d+ GBP \d+\.\d+ GBP -\d+\.\d+ \d+\.\d+ Save budget Food GBP \d+\.\d+ over/:
+        - cell "Food":
+          - strong: Food
+        - cell /GBP \d+\.\d+/
+        - cell /GBP \d+\.\d+/
+        - cell /GBP -\d+\.\d+/
+        - cell /\d+\.\d+ Save budget Food/:
+          - textbox "Budget for Food":
+            - /placeholder: Not set
+            - text: /\d+\.\d+/
+          - button "Save budget Food"
+        - cell /GBP \d+\.\d+ over/
+      - row /Income GBP \d+\.\d+ GBP \d+\.\d+ GBP \d+\.\d+ Save budget Income Not set/:
+        - cell "Income":
+          - strong: Income
+        - cell /GBP \d+\.\d+/
+        - cell /GBP \d+\.\d+/
+        - cell /GBP \d+\.\d+/
+        - cell "Save budget Income":
+          - textbox "Budget for Income":
+            - /placeholder: Not set
+          - button "Save budget Income"
+        - cell "Not set"
+  - group: Settings
+  - text: mock / mock

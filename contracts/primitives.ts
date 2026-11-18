@@ -1,6 +1,6 @@
 import { CURRENCIES, type Currency, type TransactionDraft } from "./ledger";
 
-const MAX_TEXT_LENGTH = 10_000;
+export const MAX_TEXT_LENGTH = 10_000;
 const DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 /** Narrow an untrusted IPC/file object before inspecting its fields. */

@@ -1,7 +1,7 @@
 import type { CsvMapping } from "../contracts/csv";
 import { CsvReader, type CsvRecord } from "./csv-reader";
 
-type ColumnName = "date" | "payee" | "amount" | "debit" | "credit" | "category" | "note";
+type ColumnName = "date" | "payee" | "amount" | "debit" | "credit" | "category" | "note" | "tallyId";
 const ALIASES: Record<ColumnName, string[]> = {
   date: ["date", "transactiondate", "bookingdate", "posteddate"],
   payee: ["payee", "description", "merchant", "details", "transactiondescription"],
@@ -9,6 +9,7 @@ const ALIASES: Record<ColumnName, string[]> = {
   debit: ["debit", "debitamount", "paidout", "withdrawal", "moneyout"],
   credit: ["credit", "creditamount", "paidin", "deposit", "moneyin"],
   category: ["category"], note: ["note", "notes", "memo"],
+  tallyId: ["tallyid"],
 };
 const DELIMITERS = [",", ";", "\t", "|"];
 const HEADER_SEARCH_ROWS = 50;
@@ -47,7 +48,9 @@ export function suggestMapping(document: CsvDocument): CsvMapping {
   const headers = document.records[document.headerRow]?.fields ?? [];
   const date = findColumn(headers, "date") ?? 0;
   const firstDate = document.records[document.headerRow + 1]?.fields[date] ?? "";
+  const tallyId = findColumn(headers, "tallyId");
   return {
+    ...(tallyId === null ? {} : { tallyId }),
     headerRow: document.headerRow, date, payee: findColumn(headers, "payee") ?? 1,
     amount: findColumn(headers, "amount"), debit: findColumn(headers, "debit"), credit: findColumn(headers, "credit"),
     category: findColumn(headers, "category"), note: findColumn(headers, "note"),

@@ -18,7 +18,7 @@ type WorkspaceRoute = keyof typeof WORKSPACE_VIEWS;
 const root = requiredElement<HTMLElement>(document, "#app");
 root.innerHTML = `<main data-geo="main"><header class="topbar" data-geo="title"><div class="brand"><span class="brand-mark" aria-hidden="true">t</span><div><h1>Tally</h1><p>Your money, kept local.</p></div></div><span class="backend-badge" data-testid="backend-badge">${backend.kind}</span></header>
   <nav aria-label="Workspace" data-geo="navigation">${Object.entries(WORKSPACE_VIEWS).map(([route, view]) => `<button type="button" data-route="${route}" ${route === "transactions" ? 'aria-current="page"' : ""}>${view.label}</button>`).join("")}</nav>
-  <div class="feedback"><p role="status" id="status">Opening your ledger…</p><p role="alert" id="error" hidden></p></div>
+  <div class="feedback"><p role="status" id="status">Opening your ledger…</p><button type="button" id="undo" disabled>Undo</button><p role="alert" id="error" hidden></p></div>
   <div id="content"></div>
   <footer data-geo="settings"><details><summary>Settings</summary><form id="settings-form"><label>Currency<select name="currency" aria-label="Currency">${CURRENCIES.map((currency) => `<option>${currency}</option>`).join("")}</select></label><p class="muted">One currency for this ledger. Changing it relabels amounts without converting them.</p><button type="submit">Save settings</button></form></details><span class="muted" data-testid="platform"></span></footer></main>`;
 
@@ -35,15 +35,26 @@ function showError(error: unknown): void {
   requiredElement(root, "#status").textContent = "";
 }
 
+/** Read-only actions can report success without invalidating the backend undo state. */
+function announce(message: string): void {
+  requiredElement<HTMLElement>(root, "#error").hidden = true;
+  requiredElement(root, "#status").textContent = message;
+}
+
+function updateUndoAvailability(): void {
+  requiredElement<HTMLButtonElement>(root, "#undo").disabled = mutationPending || !current?.canUndo;
+}
+
 function render(): void {
   if (!current) return;
-  const context = { view: current, perform, showError };
+  const context = { view: current, perform, showError, announce };
   requiredElement<HTMLElement>(root, "#content").replaceChildren(WORKSPACE_VIEWS[route].render(context));
   for (const button of root.querySelectorAll<HTMLButtonElement>("[data-route]")) {
     if (button.dataset.route === route) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
   }
   requiredElement<HTMLSelectElement>(root, '[name="currency"]').value = current.ledger.currency;
+  updateUndoAvailability();
 }
 
 for (const button of root.querySelectorAll<HTMLButtonElement>("[data-route]")) {
@@ -63,15 +74,17 @@ async function perform(command: LedgerCommand, message: string): Promise<void> {
   try {
     current = await backend.execute(command);
     render();
-    requiredElement<HTMLElement>(root, "#error").hidden = true;
-    requiredElement(root, "#status").textContent = message;
+    announce(message);
   } catch (error) { showError(error); }
   finally {
     mutationPending = false;
     for (const control of controls) if (control.isConnected) control.disabled = false;
     root.setAttribute("aria-busy", "false");
+    updateUndoAvailability();
   }
 }
+
+requiredElement<HTMLButtonElement>(root, "#undo").onclick = () => { void perform({ type: "undo" }, "Last change undone"); };
 
 requiredElement<HTMLFormElement>(root, "#settings-form").onsubmit = (event) => {
   event.preventDefault();

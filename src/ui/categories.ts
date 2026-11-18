@@ -1,12 +1,13 @@
 import { escapeHtml, fieldValue, requiredElement } from "./dom";
 import { rulesView } from "./rules";
 import type { ViewContext } from "./context";
+import { MAX_TEXT_LENGTH } from "../../contracts/primitives";
 
 /** Category management stays separate from the transaction entry workflow. */
 export function categoriesView(context: ViewContext): HTMLElement {
   const section = document.createElement("section");
   section.innerHTML = `<div class="section-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2>Categories and rules</h2></div></div>
-    <div class="panel"><h3>Categories</h3><form id="category-form" class="inline-form"><label>New category<input name="name" required maxlength="10000" /></label><button type="submit" class="primary">Create category</button></form>
+    <div class="panel" data-geo="categories"><h3>Categories</h3><form id="category-form" class="inline-form"><label>New category<input name="name" required maxlength="${MAX_TEXT_LENGTH}" /></label><button type="submit" class="primary">Create category</button></form>
     <p class="muted">Deleting a category leaves its transactions uncategorised and removes its rules and budgets. Merging combines category budgets.</p><ul class="category-list" id="category-list"></ul></div>`;
   const form = requiredElement<HTMLFormElement>(section, "#category-form");
   form.onsubmit = (event) => { event.preventDefault(); void context.perform({ type: "category.create", name: fieldValue(form, "name") }, "Category created"); };

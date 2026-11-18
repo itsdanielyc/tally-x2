@@ -1,0 +1,53 @@
+- main:
+  - heading "Tally" [level=1]
+  - paragraph: Your money, kept local.
+  - text: mock
+  - navigation "Workspace":
+    - button "Transactions"
+    - button "Import CSV"
+    - button "Categories"
+    - button "Monthly summary"
+  - status: Rule saved
+  - button "Undo" [disabled]
+  - paragraph: MAKE IT YOURS
+  - heading "Categories and rules" [level=2]
+  - heading "Categories" [level=3]
+  - text: New category
+  - textbox "New category"
+  - button "Create category"
+  - paragraph: Deleting a category leaves its transactions uncategorised and removes its rules and budgets. Merging combines category budgets.
+  - list:
+    - listitem:
+      - strong: Food
+      - textbox "Rename Food to"
+      - button "Rename Food"
+      - combobox "Merge Food into":
+        - option "Income" [selected]
+      - button "Merge Food"
+      - button "Delete category Food"
+    - listitem:
+      - strong: Income
+      - textbox "Rename Income to"
+      - button "Rename Income"
+      - combobox "Merge Income into":
+        - option "Food" [selected]
+      - button "Merge Income"
+      - button "Delete category Income"
+  - heading "Payee rules" [level=3]
+  - paragraph: The first matching rule wins, ignoring letter case. Explicit categories are kept. Imports use these rules automatically.
+  - text: Payee contains
+  - textbox "Payee contains"
+  - text: Rule category
+  - combobox "Rule category":
+    - option "Food" [selected]
+    - option "Income"
+  - button "Save rule"
+  - list:
+    - listitem:
+      - text: Payee contains “grocer” →
+      - strong: Food
+      - button "Edit rule grocer"
+      - button "Delete rule grocer"
+  - button "Apply rules to uncategorised"
+  - group: Settings
+  - text: mock / mock

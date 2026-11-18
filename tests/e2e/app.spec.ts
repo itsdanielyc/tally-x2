@@ -10,7 +10,7 @@ import { launchLedger, removeTemporaryDirectory, temporaryDirectory } from "./he
 
 let app: ElectronApplication;
 let win: Page;
-const consoleErrors: string[] = [];
+let consoleErrors: string[];
 let directory: string;
 
 test.describe.configure({ mode: "serial" });
@@ -20,9 +20,7 @@ test.beforeAll(async () => {
   const shell = await launchLedger(directory);
   app = shell.app;
   win = shell.page;
-  win.on("console", (m) => {
-    if (m.type() === "error") consoleErrors.push(m.text());
-  });
+  consoleErrors = shell.consoleErrors;
   await win.waitForLoadState("domcontentloaded");
 });
 

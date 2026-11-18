@@ -8,6 +8,7 @@
     - button "Categories"
     - button "Monthly summary"
   - status: All changes saved on this device
+  - button "Undo" [disabled]
   - paragraph: YOUR LEDGER
   - heading "Transactions" [level=2]
   - text: 0 recorded
@@ -27,6 +28,9 @@
     - textbox "Note (optional)"
     - button "Save transaction"
   - heading "Your transactions" [level=3]
+  - text: 0 shown · 0 total
+  - button "Export shown"
+  - group: Find transactions
   - paragraph: No transactions yet
   - text: Add your first transaction above.
   - group: Settings
