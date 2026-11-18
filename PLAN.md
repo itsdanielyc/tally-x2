@@ -30,3 +30,5 @@ Ruling: prepare later slices on isolated branches while macOS hosted jobs queue;
 
 Ruling: sample greeting UI tests retire with the deliberately replaced scaffold UI; shared greeting contract stays until the next PR, while sandbox/platform tests remain and real CRUD/restart replace sample interactions  -  slice 1 replaces the greeting by design  -  cost if wrong: sample-only behavior is no longer exercised in the renderer.
 Ruling: combine L0-L6 commands in one hosted job per Tier 1 OS  -  repeated macOS job startup/queue dominates runtime  -  cost if wrong: a failure stops later levels on that OS until fixed; all three remain required.
+
+Ruling: CSV supports UTF-8 with BOM, comma/semicolon/tab/pipe, 20 MiB bound, and two-digit years 00-69 as 2000-2069 and 70-99 as 1970-1999 - deterministic bank formats without guessing an unsupported encoding - cost if wrong: select date order or use a UTF-8 export. Accepted rows commit together; diagnostic rows stay excluded.

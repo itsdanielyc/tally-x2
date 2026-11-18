@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain, session, type IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, session, type IpcMainInvokeEvent } from "electron";
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { channels, type PlatformInfo } from "./bridge";
 import { LedgerService } from "../backend/service";
 import { FileLedgerStore } from "../persistence/file-store";
 import { validateCommand } from "../contracts/validation";
+import { pickCsvFile } from "./files";
 
 let primaryWindow: BrowserWindow | undefined;
 const dataDirectory = process.env.TALLY_DATA_DIR;
@@ -48,7 +49,14 @@ function createWindow(): void {
 function start(): void {
   configureSession();
   const ledger = new LedgerService(new FileLedgerStore(join(app.getPath("userData"), "ledger.json")));
-  ipcMain.handle(channels.pickCsv, (event) => { assertSender(event); return null; });
+  ipcMain.handle(channels.pickCsv, (event) => {
+    assertSender(event);
+    return pickCsvFile(async () => {
+      if (!app.isPackaged && process.env.TALLY_IMPORT_PATH) return process.env.TALLY_IMPORT_PATH;
+      const selection = await dialog.showOpenDialog({ title: "Import a bank CSV", properties: ["openFile"], filters: [{ name: "CSV", extensions: ["csv", "txt"] }] });
+      return selection.canceled ? undefined : selection.filePaths[0];
+    });
+  });
   ipcMain.handle(channels.snapshot, (event) => { assertSender(event); return ledger.snapshot(); });
   ipcMain.handle(channels.execute, (event, command: unknown) => { assertSender(event); return ledger.execute(validateCommand(command)); });
   ipcMain.handle(channels.platformInfo, (event) => { assertSender(event); return platformInfo(); });
