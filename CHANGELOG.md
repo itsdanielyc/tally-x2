@@ -1,7 +1,7 @@
 # Changelog
 
 <!-- keel:start -->
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-11-18
 
 ### Added
 
@@ -21,6 +21,6 @@
 
 - Unsigned Windows x64 NSIS, macOS Apple silicon DMG, Linux x64 deb and AppImage,
   with SHA256 checksums. No account, bank connection or updater.
-- Candidate draft until the PRs have merged and final evidence is recorded.
-  No tag or GitHub release exists yet.
+- All listed feature PRs are merged. Final exact-commit proof is recorded in
+  VERIFICATION.md before any tag. This build run creates no tag or GitHub release.
 <!-- keel:end -->

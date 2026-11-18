@@ -1,20 +1,21 @@
 # Tally 0.1.0 release readiness
 
 <!-- keel:start -->
-Status: candidate preparation. This run stops before the tag and GitHub release.
-The tested candidate SHA and final run links will be recorded after checks finish.
+Status: code-complete candidate; this run stops before the tag and GitHub release.
+The tested candidate SHA and final run links are pinned in the final attestation
+on main, after the exact-commit checks finish.
 
 ## Scope and version
 
 Exactly SLICES.md, built solo. Version is 0.1.0 in package.json and both lockfile
 locations; `npm run check:version` rejects drift and mismatched tags. The scaffold
 already selected 0.1.0, so there is no second bump. CHANGELOG.md takes its feature
-descriptions from the numbered PR titles and ledger; final merge provenance is
-still a gate while those PRs are open.
+descriptions from merged PR titles and ledger. PRs 1-14 are merged, with separate
+contract PRs before their implementations and the independent fixes last.
 
 ## Pre-tag gates
 
-- [ ] Slices 0-5 have Tier 1 L0-L6 evidence and their fixed done conditions.
+- [x] Slices 0-5 have Tier 1 L0-L6 evidence and their fixed done conditions.
 - [x] Empty and populated runner pixels are reviewed (18 captures, snapshots
   run 44381416035; Windows, macOS and Linux, six states each).
 - [x] Independent defect hunt is complete; findings have red/green fixes or

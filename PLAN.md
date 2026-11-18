@@ -7,11 +7,11 @@ levels must be green on every Tier 1 platform before a row becomes done.
 | # | Slice | Done when | Levels | Owner | Status |
 |---|---|---|---|---|---|
 | 0 | Scaffold | electron-web template lint/unit/UI/real-shell and installer workflows green on windows-x64, macos-arm64, linux-x64; runner visual baselines reviewed; ledger links recorded | L0-L7 | solo | done |
-| 1 | Record transactions | add/edit/delete and newest-first list; safe integer money/currency settings; versioned atomic save survives restart; validation, contract parity, file failures, UI and real restart tests green | L0-L6 | solo | open |
-| 2 | Import a bank CSV | detected delimiter/header, mapped signed or debit/credit columns, date order and preview; line diagnostics, duplicate counts and atomic confirmation; CSV/import/UI/native-dialog-bypass tests green; 2,000 accepted rows under 5 seconds | L0-L6 | solo | open |
-| 3 | Categories and rules | create/rename/delete/merge and uncategorisation; ordered contains rules on import and explicit uncategorised application; category/domain/UI/contract tests green | L0-L5 | solo | open |
-| 4 | Monthly summary and budgets | chosen month/previous/next, exact category/income/spending totals and monthly budgets remaining/over; boundary/domain/UI/contract tests green | L0-L5 | solo | open |
-| 5 | Find, export, undo | payee/note search, category/date/amount filters; export shown records and reimport unchanged; one immediate undo for delete/merge/import; domain/round-trip/UI/native export tests green | L0-L6 | solo | open |
+| 1 | Record transactions | add/edit/delete and newest-first list; safe integer money/currency settings; versioned atomic save survives restart; validation, contract parity, file failures, UI and real restart tests green | L0-L6 | solo | done |
+| 2 | Import a bank CSV | detected delimiter/header, mapped signed or debit/credit columns, date order and preview; line diagnostics, duplicate counts and atomic confirmation; CSV/import/UI/native-dialog-bypass tests green; 2,000 accepted rows under 5 seconds | L0-L6 | solo | done |
+| 3 | Categories and rules | create/rename/delete/merge and uncategorisation; ordered contains rules on import and explicit uncategorised application; category/domain/UI/contract tests green | L0-L5 | solo | done |
+| 4 | Monthly summary and budgets | chosen month/previous/next, exact category/income/spending totals and monthly budgets remaining/over; boundary/domain/UI/contract tests green | L0-L5 | solo | done |
+| 5 | Find, export, undo | payee/note search, category/date/amount filters; export shown records and reimport unchanged; one immediate undo for delete/merge/import; domain/round-trip/UI/native export tests green | L0-L6 | solo | done |
 | 6 | Release readiness | 0.1.0 version/changelog, independent bug hunt with findings resolved, final CI and L7 on release candidate commit, unsigned warnings and exact evidence recorded; no tag or GitHub release | L0-L7 | solo | open |
 
 ## Rulings
@@ -42,3 +42,5 @@ Ruling: Tally exports include stable IDs so distinct identical-looking transacti
 Ruling: the existing 0.1.0 version remains the first release version; signing stays unsigned as ADR 001 decided. The release automation reuses installer round trips and requires CI/installers on the exact tagged SHA. No tag/release is created. GitHub annotations report macOS arm64 capacity constraints and jobs never acquired; these are queued infrastructure gates, not flaky-test passes.
 
 Ruling: remove the arbitrary 20 MiB CSV cap, superseding the earlier cap ruling - it made a valid 1,050-row Tally export impossible to import - cost: large files require memory; parsing will sniff a bounded prefix and scan the document once. Header row indexes are record indexes, not column indexes.
+
+Ruling: after final candidate CI and installers pass, pin that tested main SHA and append a ledger-only attestation without moving the intended tag target - immutable run IDs are known only after a run - cost: the later tag must use the explicitly pinned SHA, not the documentation-only follow-up commit. No tag is created here.
