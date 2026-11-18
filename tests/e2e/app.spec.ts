@@ -62,6 +62,7 @@ test.describe("tally in the real shell", () => {
     }));
     expect(["win32", "darwin", "linux"]).toContain(main.os);
     expect(["x64", "arm64"]).toContain(main.arch);
+    expect(main.arch).toBe(process.platform === "darwin" ? "arm64" : "x64");
     expect(main.packaged).toBe(false);
 
     const viaBridge = await win.evaluate(() => window.electronBridge!.platformInfo());
