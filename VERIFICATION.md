@@ -20,3 +20,5 @@ is never rounded up to "tested"; anything not listed here is unverified.
 | 2026-11-18 17:18 UTC | L0/L1 scaffold harness repair | Snapshot artifacts cannot overwrite another OS with stale pixels | local windows-x64 | snapshot-artifacts.test.ts observed red with unwanted darwin/win32 PNGs, then green; lint and unit exit 0. Actual captured PNGs reviewed for all three systems. |
 
 | 2026-11-18 17:25 UTC | L0/L1 category contract preparation | Category and rule command shapes reject empty names and matches | local windows-x64 | lint exit 0; unit 39 passed; red: new commands unknown; blank-name bypass mutant failed to throw; restored green. |
+
+| 2026-11-18 17:32 UTC | L0-L5 category local preparation | Category reference integrity, rule priority, import-preview parity, explicit categorisation and UI management | local windows-x64 | lint exit 0; unit 43 passed; 5 browser journeys passed; red: Unknown ledger command, missing Categories control, preview category null vs Food; all restored green. Categories UI image reviewed. Hosted L5 pending. |
