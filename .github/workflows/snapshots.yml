@@ -46,6 +46,8 @@ jobs:
         env:
           CI: "1"
         run: npm run test:ui:update
+      - name: Keep only this runner's pixels
+        run: node scripts/filter-snapshots.mjs
       - uses: actions/upload-artifact@v7
         with:
           name: snapshots-${{ matrix.os }}
