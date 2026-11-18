@@ -31,6 +31,7 @@ export interface Ledger {
 export interface LedgerView { ledger: Ledger; canUndo: boolean }
 
 export type LedgerCommand =
+  | { type: "budget.save"; category: string; month: string; amount: number | null }
   | { type: "category.create"; name: string }
   | { type: "category.rename"; name: string; to: string }
   | { type: "category.delete"; name: string }
