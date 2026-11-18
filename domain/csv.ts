@@ -6,17 +6,26 @@ import { csvAmount, csvDate } from "./csv-values";
 import type { CsvRecord } from "./csv-reader";
 import { ruleMatcher } from "./rules";
 
-export interface CsvInspection { delimiter: string; headers: string[]; headerRow: number; headerLine: number; mapping: CsvMapping }
+export interface CsvInspection {
+  delimiter: string; headers: string[]; headerRow: number; headerLine: number; mapping: CsvMapping;
+  headerCandidates: { index: number; line: number; label: string }[];
+}
 interface ImportedTransaction extends TransactionDraft { id?: string }
 export interface ImportPreview { accepted: ImportedTransaction[]; duplicates: number; errors: { line: number; reason: string }[] }
 
 /** Inspect once for the mapping UI; preview and confirmation use the same detector. */
-export function inspectCsv(source: string): CsvInspection {
+export function inspectCsv(source: string, selectedHeader?: number): CsvInspection {
   const document = detectCsv(source);
+  if (selectedHeader !== undefined) document.headerRow = selectedHeader;
   const header = document.records[document.headerRow];
   return { delimiter: document.delimiter, headers: header?.fields ?? [], headerRow: document.headerRow,
-    headerLine: header?.line ?? 1, mapping: suggestMapping(document) };
+    headerLine: header?.line ?? 1, mapping: suggestMapping(document),
+    headerCandidates: document.records.map((record, index) => ({ index, line: record.line,
+      label: record.fields.slice(0, HEADER_PREVIEW_COLUMNS).map((field) => field.slice(0, HEADER_PREVIEW_TEXT)).join(" · ") })) };
 }
+
+const HEADER_PREVIEW_COLUMNS = 3;
+const HEADER_PREVIEW_TEXT = 32;
 
 function duplicateKey(transaction: TransactionDraft): string {
   return JSON.stringify([transaction.date, transaction.amount, transaction.payee]);
@@ -64,6 +73,7 @@ export function previewCsv(ledger: Ledger, source: string, options: CsvMapping):
   const document = detectCsv(source);
   const header = document.records[mapping.headerRow];
   if (!header) throw new Error("CSV has no header row");
+  if (header.error) throw new Error(`Header line ${header.line}: ${header.error}`);
   const identities = new Set(ledger.transactions.map(duplicateKey));
   const bankRows = new Set<string>();
   const identifiers = new Map(ledger.transactions.map((item) => [item.id, duplicateKey(item)]));

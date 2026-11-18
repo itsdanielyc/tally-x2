@@ -4,12 +4,13 @@ import { join } from "node:path";
 import { assertGeometry, captureGeometry } from "./geometry";
 
 const STATES = ["transactions", "categories", "summary", "import", "undo"] as const;
+const VISUAL_DATE = "2026-01-15";
 type VisualState = typeof STATES[number];
 
 async function populate(page: Page): Promise<void> {
   await page.goto("/");
   for (const transaction of [{ payee: "Grocer", amount: "-12.34", category: "Food", note: "Weekly" }, { payee: "Employer", amount: "1000.00", category: "Income", note: "Salary" }]) {
-    await page.getByLabel("Date", { exact: true }).fill("2026-01-15");
+    await page.getByLabel("Date", { exact: true }).fill(VISUAL_DATE);
     await page.getByLabel("Payee", { exact: true }).fill(transaction.payee);
     await page.getByLabel("Amount", { exact: true }).fill(transaction.amount);
     await page.getByLabel("Category (optional)").fill(transaction.category);
@@ -17,7 +18,7 @@ async function populate(page: Page): Promise<void> {
     await page.getByRole("button", { name: "Save transaction", exact: true }).click();
   }
   await expect(page.getByTestId("shown-count")).toHaveText("2 shown · 2 total");
-  await page.getByLabel("Date", { exact: true }).fill("2026-01-15");
+  await page.getByLabel("Date", { exact: true }).fill(VISUAL_DATE);
   await page.getByLabel("Date", { exact: true }).blur();
 }
 
@@ -49,6 +50,8 @@ async function prepare(page: Page, state: VisualState): Promise<void> {
   } else {
     await page.getByRole("button", { name: "Delete Grocer", exact: true }).click();
     await expect(page.getByRole("button", { name: "Undo", exact: true })).toBeEnabled();
+    // Deletion recreates the editor with today's date; visual fixtures must not age.
+    await page.getByLabel("Date", { exact: true }).fill(VISUAL_DATE);
   }
   await page.locator("h1").click();
 }

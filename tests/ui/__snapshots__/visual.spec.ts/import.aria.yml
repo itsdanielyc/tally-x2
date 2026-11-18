@@ -16,6 +16,11 @@
   - button "Choose CSV"
   - heading "visual.csv" [level=3]
   - paragraph: Detected ; delimiter · header line 1
+  - text: Header line
+  - combobox "Header line":
+    - 'option "Line 1: Date · Payee · Debit" [selected]'
+    - 'option /Line 2: \d+\/\d+\/\d+ · Coffee · \d+,\d+/'
+    - 'option /Line 3: \d+\/\d+\/\d+ · Invalid · \d+,\d+/'
   - text: Date column
   - combobox "Date column":
     - option "Unmapped"
@@ -94,7 +99,7 @@
         - cell "Uncategorised"
         - cell /GBP -\d+\.\d+/
   - heading "Rejected rows" [level=3]
-  - list:
+  - list "Rejected rows":
     - listitem: "Line 3: Date is not a valid calendar date"
   - paragraph: All 1 accepted rows will be saved together. Rejected rows are excluded.
   - button "Confirm import"

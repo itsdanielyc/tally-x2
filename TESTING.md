@@ -23,6 +23,7 @@ Browser builds are test surfaces only. No bank service or network dependency.
 |---|---|
 | Add, edit, delete, money validation | L1 `tests/unit/transactions.test.ts`; L4 `tests/ui/transactions.spec.ts` |
 | Save and reopen, corrupt file, failed write | L3 `tests/unit/persistence.test.ts`; L6 `tests/e2e/transactions.spec.ts` |
+| Post-commit error cannot replay stale undo | L3 `tests/unit/post-commit.test.ts`; L4 `tests/ui/find.spec.ts` |
 | Mock/backend parity and invalid payloads | L2 `tests/unit/ledger-contract.test.ts`, `tests/unit/schema.test.ts` and feature contract suites |
 | CSV preview, diagnostics, duplicates, atomic import, 2,000 rows | L1 `tests/unit/csv.test.ts`; L3 `tests/unit/import.test.ts`; L4 `tests/ui/import.spec.ts`; L6 `tests/e2e/import.spec.ts` |
 | Categories, merge, rules | L1 `tests/unit/categories.test.ts`; L4 `tests/ui/categories.spec.ts` |

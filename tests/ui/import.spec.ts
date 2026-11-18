@@ -9,7 +9,7 @@ test("previews mapped bank rows with diagnostics, confirms and skips a repeat", 
   await page.getByLabel("Decimal separator", { exact: true }).selectOption(",");
   await page.getByRole("button", { name: "Preview import", exact: true }).click();
   await expect(page.getByTestId("import-counts")).toHaveText("1 accepted · 1 duplicates skipped · 1 rejected");
-  await expect(page.getByText(/Line 4:/)).toContainText("calendar date");
+  await expect(page.getByRole("list", { name: "Rejected rows" }).getByText(/Line 4:/)).toContainText("calendar date");
   await page.screenshot({ path: "artifacts/ui/import.png", fullPage: true });
   await page.getByRole("button", { name: "Confirm import", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Imported 1 transaction");
@@ -20,4 +20,15 @@ test("previews mapped bank rows with diagnostics, confirms and skips a repeat", 
   await page.getByRole("button", { name: "Preview import", exact: true }).click();
   await expect(page.getByTestId("import-counts")).toHaveText("0 accepted · 2 duplicates skipped · 1 rejected");
   await expect(page.getByRole("button", { name: "Confirm import", exact: true })).toBeDisabled();
+});
+
+test("the person can correct an ambiguous detected header without editing the CSV", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Import CSV", exact: true }).click();
+  const csv = "Description,Debit,Credit\nDate,Payee,Amount\n2026-01-01,Kept,-1.00";
+  await page.locator('input[type="file"]').setInputFiles({ name: "ambiguous.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.getByLabel("Header line", { exact: true })).toBeVisible({ timeout: 1500 });
+  await page.getByLabel("Header line", { exact: true }).selectOption("1");
+  await page.getByRole("button", { name: "Preview import", exact: true }).click();
+  await expect(page.getByTestId("import-counts")).toHaveText("1 accepted · 0 duplicates skipped · 0 rejected");
 });

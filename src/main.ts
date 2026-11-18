@@ -75,7 +75,17 @@ async function perform(command: LedgerCommand, message: string): Promise<void> {
     current = await backend.execute(command);
     render();
     announce(message);
-  } catch (error) { showError(error); }
+  } catch (error) {
+    try {
+      const refreshed = await backend.snapshot();
+      const changed = !current || JSON.stringify(current.ledger) !== JSON.stringify(refreshed.ledger);
+      current = refreshed;
+      if (changed) render();
+    } catch {
+      if (current) current = { ...current, canUndo: false };
+    }
+    showError(error);
+  }
   finally {
     mutationPending = false;
     for (const control of controls) if (control.isConnected) control.disabled = false;

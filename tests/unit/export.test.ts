@@ -8,7 +8,7 @@ import { inspectCsv, previewCsv } from "../../domain/csv";
 import { LedgerService } from "../../backend/service";
 import { memoryStore } from "../../backend/ports";
 import { FileLedgerStore } from "../../persistence/file-store";
-import { exportCsvFile } from "../../electron/files";
+import { exportCsvFile, pickCsvFile } from "../../electron/files";
 import { PURCHASE, removeTemporaryDirectory, temporaryDirectory } from "./helpers";
 
 const ledger = { ...emptyLedger(), categories: ["Food"], transactions: [
@@ -59,5 +59,28 @@ it("protects a not-yet-created ledger reached through a directory alias", async 
     await symlink(directory, alias, process.platform === "win32" ? "junction" : "dir");
     const service = new LedgerService(memoryStore());
     await expect(exportCsvFile(service, defaultFilter(), async () => join(alias, "ledger.json"), join(directory, "ledger.json"))).rejects.toThrow(/ledger file/);
+  } finally { await removeTemporaryDirectory(directory); }
+});
+
+it("round-trips an app-generated CSV larger than the former 20 MiB cap", async () => {
+  const directory = await temporaryDirectory();
+  const ROW_COUNT = 1050;
+  const FIELD_LENGTH = 10_000;
+  const FORMER_LIMIT = 20 * 1024 * 1024;
+  try {
+    const large = { ...emptyLedger(), transactions: Array.from({ length: ROW_COUNT }, (_, index) => ({
+      ...PURCHASE, id: `large-${index}`, category: null, payee: "p".repeat(FIELD_LENGTH), note: "n".repeat(FIELD_LENGTH),
+    })) };
+    const exported = createCsvExport(large, defaultFilter());
+    expect(Buffer.byteLength(exported.content)).toBeGreaterThan(FORMER_LIMIT);
+    const source = join(directory, "large.csv");
+    await writeFile(source, exported.content, "utf8");
+    const file = await pickCsvFile(async () => source);
+    expect(file).not.toBeNull();
+    if (!file) throw new Error("CSV selection unexpectedly cancelled");
+    const service = new LedgerService(new FileLedgerStore(join(directory, "ledger.json")));
+    const imported = await service.execute({ type: "csv.import", file, mapping: inspectCsv(file.content).mapping });
+    expect(imported.ledger.transactions).toHaveLength(ROW_COUNT);
+    expect(imported.ledger.transactions).toEqual(large.transactions);
   } finally { await removeTemporaryDirectory(directory); }
 });

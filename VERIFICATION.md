@@ -8,7 +8,10 @@ is never rounded up to "tested"; anything not listed here is unverified.
 
 ## Unverified
 
-- Everything: the scaffold has not yet run in CI for this project.
+- Final exact-commit proof on main remains pending; corrected candidate CI and
+  installed-binary matrix proof exist below. Physical power interruption,
+  screen-reader L8 checks and post-tag published-asset installs remain unverified.
+  Native file-dialog journeys use the documented preset-path bypass.
 
 | 2026-11-18 16:43 UTC | L0/L1 contract preparation | Version-zero migration and invalid file/IPC payloads; new schema tests first observed red (wrong GBP/empty state; expected function to throw), restored green | local windows-x64 | npm run lint exit 0; npm run test:unit exit 0, 10 tests; hosted Tier 1 pending |
 
@@ -34,3 +37,15 @@ is never rounded up to "tested"; anything not listed here is unverified.
 | 2026-11-18 18:40 UTC | L0/L1/L7 release harness preparation | Version and checksum gates, exact-commit release gate, installed-binary driver | local windows-x64 | version/checksum tests green, deliberately broken to red (drift accepted; zero digest), restored green; installed driver rejected unpackaged Electron (expected true, got false); release gate rejected unproven 79c402b. Hosted installed-binary positive proof pending. |
 
 | 2026-11-18 19:05 UTC | L0/L1 release contract correction | Valid CSV text is not rejected by the former cap; header row indexes are independent of column bounds | local windows-x64 | lint exit 0; CSV contract 3 passed after red CSV exceeds the 20 MiB limit; the retired arbitrary-cap assertion is replaced by the large-round-trip regression and strict non-text validation. |
+
+| 2026-11-18 19:31 UTC | L0-L7 scaffold | Slice 0 green on main 590a278; per-OS runner pixels reviewed | windows-x64, macos-arm64, linux-x64 | [CI 44372039322](https://github.com/itsdanielyc/tally-x2/actions/runs/44372039322), [installers 44372039307](https://github.com/itsdanielyc/tally-x2/actions/runs/44372039307), all matrix jobs green. |
+
+| 2026-11-18 19:31 UTC | L7 installed-binary harness | Packaged binaries preserve an existing ledger, write, restart and uninstall on source 088a34a | windows-x64, macos-arm64, linux-x64 | [installers 44372351324](https://github.com/itsdanielyc/tally-x2/actions/runs/44372351324), installed-OS screenshots and bundle/checksum artifacts; final corrected candidate still requires its own run. |
+
+| 2026-11-18 19:31 UTC | Independent review + local regressions | Fresh reader found 3 defects at 8ffa92e; all locally corrected without changing fixed scope | local windows-x64 | docs/BUG-HUNT.md; 70 unit assertions and 21 non-pixel browser checks pass; 7 native checks pass. Red: stale Undo resolved and removed C, header line 2 vs 1, absent Header line selector, committed UI record missing, and >20 MiB self-export rejected. Header selector ARIA refreshed; independent re-check and corrected hosted pixels pending. |
+
+| 2026-11-18 20:27 UTC | L0-L6 corrected candidate | All carried feature checks, 70 unit assertions, 27 browser checks and 7 native checks green on e8b1a26 | windows-x64, macos-arm64, linux-x64 | [CI 44385339940](https://github.com/itsdanielyc/tally-x2/actions/runs/44385339940), all verify jobs and contact sheet green. Source matches independently rechecked 2b09dd8; pixel-only capture commit. |
+
+| 2026-11-18 20:27 UTC | L5 visual review | Reviewed 18 runner PNGs for empty, populated/find, categories/rules, budgets, import diagnostics and undo | windows-x64, macos-arm64, linux-x64 | [snapshots 44381416035](https://github.com/itsdanielyc/tally-x2/actions/runs/44381416035), artifacts/final-sheet.html and final-sheet.png inspected; no clipping or collapsed layout observed. |
+
+| 2026-11-18 20:27 UTC | Independent review re-check | All 3 original findings fixed; no new defect found in fixes at 2b09dd8 | local windows-x64 | Fresh read-only release_bug_hunt reader: 28 focused tests, 4 Chromium tests, 3 original reproductions and 2,000 generated quote/newline/Unicode parser checks; docs/BUG-HUNT.md. |

@@ -5,6 +5,14 @@ import { inspectCsv, previewCsv } from "../../domain/csv";
 const BANK = 'Bank export\r\nDate;Description;Debit;Credit\r\n31/01/2026;"Cafe; ""Central""";12,34;\r\n01/02/2026;Salary;;1000,00\r\n31/02/2026;Bad;1,00;\r\n01/02/2026;Salary;;1000,00';
 
 describe("CSV importer used by preview and confirmation", () => {
+  it("never promotes a dated transaction to header because its payee matches an alias", () => {
+    const csv = "Posted,Name,Money\n2026-01-01,Debit,-1.00\n2026-01-02,Corner shop,-2.00";
+    const inspection = inspectCsv(csv);
+    expect(inspection.headerLine).toBe(1);
+    const preview = previewCsv(emptyLedger(), csv, { ...inspection.mapping, date: 0, payee: 1, amount: 2 });
+    expect(preview.accepted.map((item) => item.payee)).toEqual(["Debit", "Corner shop"]);
+    expect(preview.errors).toEqual([]);
+  });
   it("detects a semicolon header after a preamble, maps debit/credit and reports exact lines", () => {
     const inspection = inspectCsv(BANK);
     expect(inspection).toMatchObject({ delimiter: ";", headerRow: 1, headers: ["Date", "Description", "Debit", "Credit"] });
