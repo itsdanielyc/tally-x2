@@ -3,8 +3,29 @@
   "name": "tally",
   "profile": "electron-web",
   "platforms": {
-    "tier1": ["windows-x64", "macos-arm64", "linux-x64"],
+    "tier1": [
+      "windows-x64",
+      "macos-arm64",
+      "linux-x64"
+    ],
     "tier2": [],
     "tier3": []
+  },
+  "commands": {
+    "lint": "npm run lint",
+    "unit": "npm run test:unit",
+    "contracts": "npm run test:unit",
+    "integration": null,
+    "ui": "npm run test:ui",
+    "e2e": "npm run test:e2e",
+    "build": "npm run build",
+    "package": "npm run package",
+    "installers": null
+  },
+  "paths": {
+    "ui": "src/",
+    "native": "electron/",
+    "contracts": "contracts/",
+    "e2e": "tests/e2e/"
   }
 }
