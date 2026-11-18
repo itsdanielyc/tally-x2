@@ -8,10 +8,12 @@ is never rounded up to "tested"; anything not listed here is unverified.
 
 ## Unverified
 
-- Final exact-commit proof on main remains pending; corrected candidate CI and
-  installed-binary matrix proof exist below. Physical power interruption,
-  screen-reader L8 checks and post-tag published-asset installs remain unverified.
-  Native file-dialog journeys use the documented preset-path bypass.
+- No required pre-tag Keel gate remains unverified for pinned candidate
+  `fb1aa5135d5c5d1c24b24caef00f46aa764e7097`.
+- Physical power interruption, screen-reader L8 checks and post-tag
+  published-asset installs remain unverified. Native file-dialog journeys use
+  the documented preset-path bypass; manual OS dialog interaction was not driven.
+- Bundles are intentionally unsigned/not notarized, as ADR 001 specifies.
 
 | 2026-11-18 16:43 UTC | L0/L1 contract preparation | Version-zero migration and invalid file/IPC payloads; new schema tests first observed red (wrong GBP/empty state; expected function to throw), restored green | local windows-x64 | npm run lint exit 0; npm run test:unit exit 0, 10 tests; hosted Tier 1 pending |
 
@@ -51,3 +53,13 @@ is never rounded up to "tested"; anything not listed here is unverified.
 | 2026-11-18 20:27 UTC | Independent review re-check | All 3 original findings fixed; no new defect found in fixes at 2b09dd8 | local windows-x64 | Fresh read-only release_bug_hunt reader: 28 focused tests, 4 Chromium tests, 3 original reproductions and 2,000 generated quote/newline/Unicode parser checks; docs/BUG-HUNT.md. |
 
 | 2026-11-18 20:44 UTC | L0-L6 slices 1-5 complete | All fixed feature done conditions on corrected source, including 2,000-row budget and exact large CSV round trip | windows-x64, macos-arm64, linux-x64 | [CI 44391814461](https://github.com/itsdanielyc/tally-x2/actions/runs/44391814461) at e192e56, 70 unit assertions, 27 browser checks and 7 native checks; independent re-check at identical product source 2b09dd8. All feature/contract/fix PRs 1-14 merged in dependency order. |
+
+## Final pre-tag attestation
+
+Candidate: fb1aa5135d5c5d1c24b24caef00f46aa764e7097 (0.1.0, on main). This attestation is documentation-only; tag the pinned tested candidate, not this follow-up.
+
+| Date | Level | Claim | Platforms | Evidence |
+|---|---|---|---|---|
+| 2026-11-18 21:11 UTC | L0-L6 final candidate | Version/types/lint/dead-code limits, 70 unit/contract/I-O assertions, 27 browser checks, 7 native checks; all fixed slices 0-5 complete | windows-x64, macos-arm64, linux-x64 | [CI 44394134197](https://github.com/itsdanielyc/tally-x2/actions/runs/44394134197), success on exact candidate; first macOS job never acquired a runner, requeued without changing code; all verify jobs and contact sheet green. |
+| 2026-11-18 21:11 UTC | L7 final candidate | NSIS, DMG, deb and AppImage installed, launched against a saved ledger, wrote, restarted and uninstalled; SHA256 manifests generated | windows-x64, macos-arm64, linux-x64 | [installers 44394134219](https://github.com/itsdanielyc/tally-x2/actions/runs/44394134219), all 3 jobs green on exact candidate. Four installed-binary screenshots reviewed in artifacts/installed-sheet.html; bundle/checksum and installed-OS artifacts retained. |
+| 2026-11-18 21:11 UTC | Release readiness | Slice 6 complete before tag: fixed scope, merged changelog provenance, independent three-finding hunt and successful re-check, unsigned disclosure, exact-commit gates | all Tier 1; Tier 2/3 empty by fixed ADR | npm run check:release -- fb1aa5135d5c5d1c24b24caef00f46aa764e7097 exit 0; npm run check:version exit 0; docs/BUG-HUNT.md and docs/RELEASE-NOTES.md. No tag or GitHub release created. |

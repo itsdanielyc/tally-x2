@@ -12,7 +12,7 @@ levels must be green on every Tier 1 platform before a row becomes done.
 | 3 | Categories and rules | create/rename/delete/merge and uncategorisation; ordered contains rules on import and explicit uncategorised application; category/domain/UI/contract tests green | L0-L5 | solo | done |
 | 4 | Monthly summary and budgets | chosen month/previous/next, exact category/income/spending totals and monthly budgets remaining/over; boundary/domain/UI/contract tests green | L0-L5 | solo | done |
 | 5 | Find, export, undo | payee/note search, category/date/amount filters; export shown records and reimport unchanged; one immediate undo for delete/merge/import; domain/round-trip/UI/native export tests green | L0-L6 | solo | done |
-| 6 | Release readiness | 0.1.0 version/changelog, independent bug hunt with findings resolved, final CI and L7 on release candidate commit, unsigned warnings and exact evidence recorded; no tag or GitHub release | L0-L7 | solo | open |
+| 6 | Release readiness | 0.1.0 version/changelog, independent bug hunt with findings resolved, final CI and L7 on release candidate commit, unsigned warnings and exact evidence recorded; no tag or GitHub release | L0-L7 | solo | done |
 
 ## Rulings
 
@@ -44,3 +44,5 @@ Ruling: the existing 0.1.0 version remains the first release version; signing st
 Ruling: remove the arbitrary 20 MiB CSV cap, superseding the earlier cap ruling - it made a valid 1,050-row Tally export impossible to import - cost: large files require memory; parsing will sniff a bounded prefix and scan the document once. Header row indexes are record indexes, not column indexes.
 
 Ruling: after final candidate CI and installers pass, pin that tested main SHA and append a ledger-only attestation without moving the intended tag target - immutable run IDs are known only after a run - cost: the later tag must use the explicitly pinned SHA, not the documentation-only follow-up commit. No tag is created here.
+
+Ruling: restore generic spike placeholder substitutions in the 62 supplied local Keel files written by the in-place generator - the generator also walked its own installed copies - cost: none to Tally; no other machine skill copy was read, and the app retains its Tally name. All seven fixed slices are done; only the explicitly excluded tag/release and documented unverified limits remain.

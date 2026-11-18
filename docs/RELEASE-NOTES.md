@@ -1,9 +1,15 @@
 # Tally 0.1.0 release readiness
 
 <!-- keel:start -->
-Status: code-complete candidate; this run stops before the tag and GitHub release.
-The tested candidate SHA and final run links are pinned in the final attestation
-on main, after the exact-commit checks finish.
+Status: **ready to tag 0.1.0** at
+`fb1aa5135d5c5d1c24b24caef00f46aa764e7097` on main.
+The subsequent documentation-only attestation does not move this tag target.
+No tag or GitHub release has been created.
+
+Exact candidate proof: [CI 44394134197](https://github.com/itsdanielyc/tally-x2/actions/runs/44394134197)
+and [installers 44394134219](https://github.com/itsdanielyc/tally-x2/actions/runs/44394134219).
+`npm run check:release -- fb1aa5135d5c5d1c24b24caef00f46aa764e7097`
+and `npm run check:version` both exited 0.
 
 ## Scope and version
 
@@ -20,11 +26,11 @@ contract PRs before their implementations and the independent fixes last.
   run 44381416035; Windows, macOS and Linux, six states each).
 - [x] Independent defect hunt is complete; findings have red/green fixes or
   are named under Known defects.
-- [ ] Final CI is green on windows-x64, macos-arm64 and linux-x64.
-- [ ] Final NSIS, DMG, deb and AppImage installer round trips are green.
-- [ ] Installed binaries preserve a saved ledger, write a transaction, reopen
+- [x] Final CI is green on windows-x64, macos-arm64 and linux-x64.
+- [x] Final NSIS, DMG, deb and AppImage installer round trips are green.
+- [x] Installed binaries preserve a saved ledger, write a transaction, reopen
   and uninstall; screenshots and SHA256 sums are retained as workflow artifacts.
-- [ ] `npm run check:release -- <candidate-sha>` passes before any tag.
+- [x] `npm run check:release -- <candidate-sha>` passes before any tag.
 
 Tier 2 and Tier 3 are empty by the fixed ADR. The tag workflow checks the exact
 commit's green CI/installers, version and main ancestry, then rebuilds/installs
