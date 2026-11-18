@@ -6,6 +6,7 @@ import { LedgerService } from "../backend/service";
 import { FileLedgerStore } from "../persistence/file-store";
 import { validateCommand } from "../contracts/validation";
 import { pickCsvFile } from "./files";
+import { validateFilter } from "../contracts/find";
 
 let primaryWindow: BrowserWindow | undefined;
 const dataDirectory = process.env.TALLY_DATA_DIR;
@@ -49,6 +50,7 @@ function createWindow(): void {
 function start(): void {
   configureSession();
   const ledger = new LedgerService(new FileLedgerStore(join(app.getPath("userData"), "ledger.json")));
+  ipcMain.handle(channels.exportCsv, (event, filter: unknown) => { assertSender(event); validateFilter(filter); return null; });
   ipcMain.handle(channels.pickCsv, (event) => {
     assertSender(event);
     return pickCsvFile(async () => {

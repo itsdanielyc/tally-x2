@@ -58,6 +58,7 @@ export function decodeLedger(value: unknown): Ledger {
 export function validateCommand(value: unknown): LedgerCommand {
   const command = objectValue(value);
   switch (command.type) {
+    case "undo": return { type: command.type };
     case "budget.save": return budgetCommand(command);
     case "csv.import": return { type: command.type, file: csvFile(command.file), mapping: csvMapping(command.mapping) };
     case "transaction.save": return {

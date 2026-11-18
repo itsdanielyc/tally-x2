@@ -10,8 +10,10 @@ import type { LedgerApi } from "../contracts/ledger";
 import { LedgerService } from "../backend/service";
 import { memoryStore } from "../backend/ports";
 import type { CsvFile } from "../contracts/csv";
+import type { ExportReceipt, TransactionFilter } from "../contracts/find";
 
 export interface Backend extends LedgerApi {
+  exportCsv(filter: TransactionFilter): Promise<ExportReceipt | null>;
   pickCsv(): Promise<CsvFile | null>;
   readonly kind: "native" | "mock";
   greet(name: string): Promise<string>;
@@ -29,6 +31,7 @@ const bridge = typeof window !== "undefined" ? window.electronBridge : undefined
 const mockLedger = new LedgerService(memoryStore());
 
 export const mock: Backend = {
+  exportCsv: async () => ({ name: "tally.csv", count: 0 }),
   pickCsv: async () => null,
   snapshot: () => mockLedger.snapshot(),
   execute: (command) => mockLedger.execute(command),
@@ -45,6 +48,7 @@ export const mock: Backend = {
 export const backend: Backend = bridge
   ? {
       kind: "native",
+      exportCsv: (filter) => bridge.exportCsv(filter),
       pickCsv: () => bridge.pickCsv(),
       snapshot: () => bridge.snapshot(),
       execute: (command) => bridge.execute(command),
