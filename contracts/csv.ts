@@ -1,6 +1,5 @@
 import { objectValue, textValue } from "./primitives";
 
-export const MAX_CSV_BYTES = 20 * 1024 * 1024;
 const MAX_COLUMN_INDEX = 999;
 export interface CsvFile { name: string; content: string }
 export interface CsvMapping {
@@ -23,17 +22,18 @@ function columnIndex(value: unknown): number {
 
 function optionalColumn(value: unknown): number | null { return value === null ? null : columnIndex(value); }
 
-/** Bound content before parsing; the native file boundary also checks bytes. */
+/** Preserve well-typed CSV text; any file produced by export must remain importable. */
 export function csvFile(value: unknown): CsvFile {
   const file = objectValue(value);
-  if (typeof file.content !== "string" || file.content.length > MAX_CSV_BYTES) throw new Error("CSV exceeds the 20 MiB limit");
+  if (typeof file.content !== "string") throw new Error("CSV content must be text");
   return { name: textValue(file.name, "CSV filename"), content: file.content };
 }
 
 /** Validate mappings even when callers bypass the renderer. */
 export function csvMapping(value: unknown): CsvMapping {
   const mapping = objectValue(value);
-  const headerRow = columnIndex(mapping.headerRow);
+  const headerRow = mapping.headerRow;
+  if (typeof headerRow !== "number" || !Number.isSafeInteger(headerRow) || headerRow < 0) throw new Error("Invalid CSV header row");
   const dateOrder = mapping.dateOrder;
   const decimalSeparator = mapping.decimalSeparator;
   if (dateOrder !== "DMY" && dateOrder !== "MDY" && dateOrder !== "YMD") throw new Error("Choose a date order");

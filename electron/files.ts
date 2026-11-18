@@ -1,6 +1,6 @@
 import { open, realpath } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
-import { MAX_CSV_BYTES, type CsvFile } from "../contracts/csv";
+import type { CsvFile } from "../contracts/csv";
 import { validateFilter, type ExportReceipt, type TransactionFilter } from "../contracts/find";
 import type { LedgerApi } from "../contracts/ledger";
 import { createCsvExport } from "../domain/export";
@@ -12,9 +12,7 @@ export async function pickCsvFile(choosePath: () => Promise<string | undefined>)
   if (!path) return null;
   const handle = await open(path, "r");
   try {
-    if ((await handle.stat()).size > MAX_CSV_BYTES) throw new Error("CSV exceeds the 20 MiB limit");
     const bytes = await handle.readFile();
-    if (bytes.byteLength > MAX_CSV_BYTES) throw new Error("CSV exceeds the 20 MiB limit");
     const content = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
     return { name: basename(path), content };
   } finally { await handle.close(); }
