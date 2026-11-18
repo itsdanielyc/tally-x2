@@ -9,3 +9,5 @@ is never rounded up to "tested"; anything not listed here is unverified.
 ## Unverified
 
 - Everything: the scaffold has not yet run in CI for this project.
+
+| 2026-11-18 17:18 UTC | L0/L1 scaffold harness repair | Snapshot artifacts cannot overwrite another OS with stale pixels | local windows-x64 | snapshot-artifacts.test.ts observed red with unwanted darwin/win32 PNGs, then green; lint and unit exit 0. Actual captured PNGs reviewed for all three systems. |
