@@ -24,3 +24,10 @@ export function decimalAmount(amount: number): string {
 export function formatMoney(amount: number, currency: string): string {
   return `${currency} ${decimalAmount(amount)}`;
 }
+
+/** Time O(n), space O(1): aggregate exactly before checking the safe integer bound. */
+export function sumMoney(amounts: Iterable<number>): number {
+  let total = 0n;
+  for (const amount of amounts) total += BigInt(minorUnits(amount));
+  return minorUnits(Number(total));
+}

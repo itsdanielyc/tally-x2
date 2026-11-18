@@ -5,6 +5,7 @@
   - navigation "Workspace":
     - button "Transactions"
     - button "Import CSV"
+    - button "Categories"
   - status: All changes saved on this device
   - paragraph: YOUR LEDGER
   - heading "Transactions" [level=2]

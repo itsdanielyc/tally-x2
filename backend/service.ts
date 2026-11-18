@@ -1,7 +1,6 @@
 import type { Ledger, LedgerApi, LedgerCommand, LedgerView } from "../contracts/ledger";
 import { decodeLedger, validateCommand } from "../contracts/validation";
-import { applyTransactionCommand } from "../domain/transactions";
-import { importCsv } from "../domain/csv";
+import { deriveLedger } from "./commands";
 import type { LedgerStore } from "./ports";
 
 /** One queue owns state, ensuring a save failure never publishes a partial change. */
@@ -21,9 +20,7 @@ export class LedgerService implements LedgerApi {
     return this.enqueue(async () => {
       const command = validateCommand(payload);
       const previous = await this.load();
-      const candidate = command.type === "csv.import" ? importCsv(previous, command, this.createId)
-        : applyTransactionCommand(previous, command, this.createId);
-      if (!candidate) throw new Error("Unknown ledger command");
+      const candidate = deriveLedger(previous, command, this.createId);
       if (candidate === previous) return this.view(previous);
       const next = decodeLedger(candidate);
       try {

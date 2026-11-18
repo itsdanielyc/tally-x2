@@ -4,6 +4,7 @@ import { transactionDraft } from "../contracts/primitives";
 import { detectCsv, suggestMapping } from "./csv-inspect";
 import { csvAmount, csvDate } from "./csv-values";
 import type { CsvRecord } from "./csv-reader";
+import { ruleMatcher } from "./rules";
 
 export interface CsvInspection { delimiter: string; headers: string[]; headerRow: number; headerLine: number; mapping: CsvMapping }
 export interface ImportPreview { accepted: TransactionDraft[]; duplicates: number; errors: { line: number; reason: string }[] }
@@ -47,6 +48,7 @@ export function previewCsv(ledger: Ledger, source: string, options: CsvMapping):
   const header = document.records[mapping.headerRow];
   if (!header) throw new Error("CSV has no header row");
   const seen = new Set(ledger.transactions.map(duplicateKey));
+  const match = ruleMatcher(ledger.rules);
   const preview: ImportPreview = { accepted: [], duplicates: 0, errors: [] };
   for (let index = mapping.headerRow + 1; index < document.records.length; index++) {
     const record = document.records[index];
@@ -55,6 +57,7 @@ export function previewCsv(ledger: Ledger, source: string, options: CsvMapping):
       const key = duplicateKey(transaction);
       if (seen.has(key)) { preview.duplicates++; continue; }
       seen.add(key);
+      transaction.category ??= match(transaction.payee);
       preview.accepted.push(transaction);
     } catch (error) {
       preview.errors.push({ line: record.line, reason: error instanceof Error ? error.message : String(error) });
@@ -69,8 +72,9 @@ export function importCsv(ledger: Ledger, command: Extract<LedgerCommand, { type
   if (!preview.accepted.length) return ledger;
   const categories = new Set(ledger.categories);
   const transactions = preview.accepted.map((transaction) => {
-    if (transaction.category !== null) categories.add(transaction.category);
-    return { ...transaction, id: createId() };
+    const category = transaction.category;
+    if (category !== null) categories.add(category);
+    return { ...transaction, category, id: createId() };
   });
   return { ...ledger, categories: [...categories], transactions: [...transactions, ...ledger.transactions] };
 }

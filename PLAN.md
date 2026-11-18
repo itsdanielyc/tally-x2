@@ -32,3 +32,5 @@ Ruling: sample greeting UI tests retire with the deliberately replaced scaffold 
 Ruling: combine L0-L6 commands in one hosted job per Tier 1 OS  -  repeated macOS job startup/queue dominates runtime  -  cost if wrong: a failure stops later levels on that OS until fixed; all three remain required.
 
 Ruling: CSV supports UTF-8 with BOM, comma/semicolon/tab/pipe, 20 MiB bound, and two-digit years 00-69 as 2000-2069 and 70-99 as 1970-1999 - deterministic bank formats without guessing an unsupported encoding - cost if wrong: select date order or use a UTF-8 export. Accepted rows commit together; diagnostic rows stay excluded.
+
+Ruling: first case-insensitive contains rule wins; explicit categories take precedence; deleting a category removes its rules and budgets, and merging sums matching monthly budgets - preserves intentional classification and keeps references valid - cost if wrong: later rule-priority controls would be another slice.
