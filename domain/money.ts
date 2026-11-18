@@ -14,14 +14,14 @@ export function parseMoney(text: string): number {
 }
 
 /** Format an integer amount exactly, including values near Number's safe limit. */
-export function decimalAmount(amount: number): string {
-  const integer = BigInt(minorUnits(amount));
+export function decimalAmount(amount: number | bigint): string {
+  const integer = typeof amount === "bigint" ? amount : BigInt(minorUnits(amount));
   const absolute = integer < 0n ? -integer : integer;
   return `${integer < 0n ? "-" : ""}${absolute / MINOR_UNITS_PER_MAJOR}.${String(absolute % MINOR_UNITS_PER_MAJOR).padStart(2, "0")}`;
 }
 
 /** Currency is explicit so text copied out of a ledger is unambiguous. */
-export function formatMoney(amount: number, currency: string): string {
+export function formatMoney(amount: number | bigint, currency: string): string {
   return `${currency} ${decimalAmount(amount)}`;
 }
 

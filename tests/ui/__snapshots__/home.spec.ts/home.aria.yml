@@ -6,6 +6,7 @@
     - button "Transactions"
     - button "Import CSV"
     - button "Categories"
+    - button "Monthly summary"
   - status: All changes saved on this device
   - paragraph: YOUR LEDGER
   - heading "Transactions" [level=2]

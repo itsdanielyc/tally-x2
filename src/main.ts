@@ -3,6 +3,7 @@ import { CURRENCIES, type LedgerCommand, type LedgerView } from "../contracts/le
 import { transactionsView } from "./ui/transactions";
 import { importView } from "./ui/import";
 import { categoriesView } from "./ui/categories";
+import { summaryView } from "./ui/summary";
 import { fieldValue, requiredElement } from "./ui/dom";
 import { currencyValue } from "../contracts/primitives";
 
@@ -10,6 +11,7 @@ const WORKSPACE_VIEWS = {
   transactions: { label: "Transactions", render: transactionsView },
   import: { label: "Import CSV", render: importView },
   categories: { label: "Categories", render: categoriesView },
+  summary: { label: "Monthly summary", render: summaryView },
 };
 type WorkspaceRoute = keyof typeof WORKSPACE_VIEWS;
 

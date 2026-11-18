@@ -49,6 +49,16 @@ label small { font-size: 10px; font-weight: 400; color: #7d897c; }
 .category-list li { display: grid; grid-template-columns: 1fr 2fr 2fr auto; gap: 16px; align-items: center; border-top: 1px solid var(--border); padding: 14px 0; font-size: 13px; }
 .category-list form { display: flex; gap: 6px; }
 .category-list input, .category-list select { min-width: 60px; }
+.month-controls { display: flex; gap: 16px; align-items: end; margin-bottom: 22px; }
+.month-controls label { min-width: 170px; }
+.metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.metric strong { font: 600 23px/1.5 ui-monospace, monospace; letter-spacing: -1px; }
+.metric h3 { color: #7a897c; font-weight: 500; margin-bottom: 8px; }
+.metric strong { display: block; overflow-wrap: anywhere; }
+.budget-form { display: flex; gap: 5px; }
+.budget-form input { width: 95px; }
+.budget-form button { padding: 5px 8px; font-size: 11px; }
+.over-budget { color: #aa4137; }
 .ledger-panel { padding-bottom: 14px; }
 .table-scroll { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 12px; text-align: left; }
