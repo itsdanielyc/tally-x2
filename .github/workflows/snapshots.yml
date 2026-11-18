@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-15]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -84,5 +84,5 @@ jobs:
             branch="snapshots/update-${{ github.run_id }}"
             git checkout -b "$branch"
             git push origin "$branch"
-            gh pr create --base main --head "$branch"               --title "Update visual snapshots (run ${{ github.run_id }})"               --body "Baselines captured on ubuntu-latest, windows-latest and macos-latest by the snapshots workflow. Review the images before merging."
+            gh pr create --base main --head "$branch"               --title "Update visual snapshots (run ${{ github.run_id }})"               --body "Baselines captured on ubuntu-latest, windows-latest and macos-15 by the snapshots workflow. Review the images before merging."
           fi

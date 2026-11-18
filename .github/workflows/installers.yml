@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-15]
     env:
       # No certificate lookup in the keychain, so macOS builds stay unsigned
       # (ad hoc) and electron-builder never tries to notarize.

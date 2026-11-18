@@ -23,3 +23,5 @@ levels must be green on every Tier 1 platform before a row becomes done.
 - Planning: Ruling: push/PR/merge/workflow actions proceed without confirmation — explicitly authorised for this unattended run — cost if wrong: reversible repository history.
 - Planning: Ruling: release bug hunt may use one fresh reader as keel-release explicitly requires; implementation remains solo — independent review catches shared author/test assumptions — cost if wrong: review overhead only.
 <!-- keel:end -->
+
+Ruling: pin macOS CI to macos-15 and assert arm64 in the real shell � macos-latest remained queued while other runners finished � cost if wrong: the architecture assertion fails and the runner must be revised.
