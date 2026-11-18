@@ -1,4 +1,5 @@
 :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #23322e; background: #f4f5f0; font-synthesis: none; text-rendering: optimizeLegibility; --accent: #236c58; --border: #dce2d9; }
+:root { line-height: 1.5; }
 * { box-sizing: border-box; }
 body { margin: 0; }
 main { max-width: 1200px; margin: 0 auto; padding: 28px 36px; }
