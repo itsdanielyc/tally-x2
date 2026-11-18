@@ -25,7 +25,7 @@ function Stop-Installed($dir) {
 }
 
 function Smoke-Launch($exe) {
-  $p = Start-Process -FilePath $exe -PassThru
+  $p = Start-Process -FilePath $exe -WindowStyle Hidden -PassThru
   Start-Sleep -Seconds 6
   $alive = -not $p.HasExited
   Stop-Installed (Split-Path $exe)
@@ -35,14 +35,14 @@ function Smoke-Launch($exe) {
 
 $setup = Get-ChildItem "$bundle\*-setup.exe" | Select-Object -First 1
 Assert ($null -ne $setup) "NSIS installer exists"
-$proc = Start-Process -FilePath $setup.FullName -ArgumentList "/S" -Wait -PassThru
+$proc = Start-Process -FilePath $setup.FullName -ArgumentList "/S" -WindowStyle Hidden -Wait -PassThru
 Assert ($proc.ExitCode -eq 0) "NSIS silent install exit code 0"
 $exe = Find-Installed
 Assert ($null -ne $exe) "tally.exe found after NSIS install"
 Smoke-Launch $exe
 $uninst = Join-Path (Split-Path $exe) "Uninstall tally.exe"
 Assert (Test-Path $uninst) "uninstaller present"
-$proc = Start-Process -FilePath $uninst -ArgumentList "/S" -Wait -PassThru
+$proc = Start-Process -FilePath $uninst -ArgumentList "/S" -WindowStyle Hidden -Wait -PassThru
 Assert ($proc.ExitCode -eq 0) "NSIS silent uninstall exit code 0"
 # The NSIS uninstaller re-launches itself from a temp copy and returns at once;
 # wait for the files to go rather than for the process.
