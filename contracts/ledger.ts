@@ -31,6 +31,13 @@ export interface Ledger {
 export interface LedgerView { ledger: Ledger; canUndo: boolean }
 
 export type LedgerCommand =
+  | { type: "category.create"; name: string }
+  | { type: "category.rename"; name: string; to: string }
+  | { type: "category.delete"; name: string }
+  | { type: "category.merge"; source: string; target: string }
+  | { type: "rule.save"; id?: string; contains: string; category: string }
+  | { type: "rule.delete"; id: string }
+  | { type: "rule.apply" }
   | { type: "csv.import"; file: CsvFile; mapping: CsvMapping }
   | { type: "transaction.save"; transaction: TransactionDraft; id?: string }
   | { type: "transaction.delete"; id: string }

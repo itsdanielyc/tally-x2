@@ -1,6 +1,7 @@
 import { LEDGER_VERSION, type Ledger, type LedgerCommand, type Transaction } from "./ledger";
 import { calendarDate, currencyValue, minorUnits, objectValue, textValue, transactionDraft } from "./primitives";
 import { csvFile, csvMapping } from "./csv";
+import { categoryCommand } from "./categories";
 
 /** Parse each element, failing the entire file rather than silently dropping rows. */
 function arrayValue<T>(value: unknown, parse: (item: unknown) => T): T[] {
@@ -63,6 +64,6 @@ export function validateCommand(value: unknown): LedgerCommand {
     };
     case "transaction.delete": return { type: command.type, id: textValue(command.id, "Transaction ID") };
     case "settings.currency": return { type: command.type, currency: currencyValue(command.currency) };
-    default: throw new Error("Unknown ledger command");
+    default: return categoryCommand(command);
   }
 }
