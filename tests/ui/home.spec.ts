@@ -8,6 +8,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByTestId("backend-badge")).toHaveText("mock");
   await expect(page.getByLabel("Payee", { exact: true })).toBeVisible();
   await page.getByLabel("Date", { exact: true }).fill("2026-01-15");
+  await page.getByLabel("Date", { exact: true }).blur();
   await expect(page.getByRole("status")).toContainText("All changes saved");
 });
 
