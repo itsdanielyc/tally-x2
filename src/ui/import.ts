@@ -1,5 +1,5 @@
 import { backend } from "../api";
-import { csvFile, csvMapping, MAX_CSV_BYTES, type CsvFile, type CsvMapping } from "../../contracts/csv";
+import { csvFile, csvMapping, type CsvFile, type CsvMapping } from "../../contracts/csv";
 import { inspectCsv, previewCsv, type CsvInspection, type ImportPreview } from "../../domain/csv";
 import { formatMoney } from "../../domain/money";
 import { escapeHtml, fieldValue, requiredElement } from "./dom";
@@ -28,7 +28,6 @@ export function importView(context: ViewContext): HTMLElement {
   input.onchange = () => {
     const file = input.files?.[0];
     if (!file) return;
-    if (file.size > MAX_CSV_BYTES) { context.showError(new Error("CSV exceeds the 20 MiB limit")); return; }
     void file.arrayBuffer().then((bytes) => prepare({ name: file.name, content: new TextDecoder("utf-8", { fatal: true }).decode(bytes) })).catch((error: unknown) => context.showError(error));
   };
   return section;
