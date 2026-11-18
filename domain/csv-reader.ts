@@ -1,9 +1,13 @@
+import { MAX_TEXT_LENGTH } from "../contracts/primitives";
+
 export interface CsvRecord { line: number; fields: string[]; error?: string }
 const MAX_COLUMNS = 1000;
 
-/** Time O(n), space O(n): one state machine preserves quotes and physical lines. */
+/** Time O(n), space O(n): slice segments rather than allocating a string per character. */
 export class CsvReader {
-  private field = "";
+  private start = 0;
+  private parts: string[] = [];
+  private fieldLength = 0;
   private fields: string[] = [];
   private records: CsvRecord[] = [];
   private line = 1;
@@ -14,59 +18,65 @@ export class CsvReader {
 
   constructor(private readonly delimiter: string) {}
 
-  /** Consume CSV without splitting physical lines inside quoted fields. */
+  /** Count physical lines while preserving their original bytes inside quoted fields. */
   read(source: string): CsvRecord[] {
     const text = source.replace(/^\ufeff/, "");
     for (let index = 0; index < text.length; index++) {
       const character = text[index];
       const next = text[index + 1];
       if (character === "\n" || character === "\r") {
-        const newline = character === "\r" && next === "\n" ? "\r\n" : character;
-        if (this.quoted) this.field += newline;
-        else this.finishRecord();
+        const length = character === "\r" && next === "\n" ? 2 : 1;
+        if (!this.quoted) this.finishRecord(text, index);
         this.line++;
-        if (!this.quoted) this.rowStart = this.line;
-        if (newline.length === 2) index++;
-      } else if (this.consume(character, next)) index++;
+        if (!this.quoted) { this.rowStart = this.line; this.start = index + length; }
+        if (length === 2) index++;
+      } else if (this.consume(text, index, character, next)) index++;
     }
     if (this.quoted) this.error = "Unclosed quoted field";
-    this.finishRecord();
+    this.finishRecord(text, text.length);
     return this.records;
   }
 
-  private consume(character: string, next: string | undefined): boolean {
-    if (this.quoted) return this.consumeQuoted(character, next);
-    if (character === this.delimiter) { this.finishField(); return false; }
+  private consume(text: string, index: number, character: string, next: string | undefined): boolean {
+    if (this.quoted) return this.consumeQuoted(text, index, character, next);
+    if (character === this.delimiter) { this.finishField(text, index); return false; }
     if (character === '"') {
-      if (this.field.length || this.closedQuote) this.error = "Unexpected quote in unquoted field";
-      else this.quoted = true;
+      if (index !== this.start || this.closedQuote) this.error = "Unexpected quote in unquoted field";
+      else { this.quoted = true; this.start = index + 1; }
       return false;
     }
-    if (this.closedQuote) {
-      if (character.trim()) this.error = "Unexpected text after closing quote";
-      return false;
-    }
-    this.field += character;
+    if (this.closedQuote && character.trim()) this.error = "Unexpected text after closing quote";
     return false;
   }
 
-  private consumeQuoted(character: string, next: string | undefined): boolean {
-    if (character !== '"') { this.field += character; return false; }
-    if (next === '"') { this.field += '"'; return true; }
+  private consumeQuoted(text: string, index: number, character: string, next: string | undefined): boolean {
+    if (character !== '"') return false;
+    this.append(text.slice(this.start, index));
+    if (next === '"') { this.append('"'); this.start = index + 2; return true; }
     this.quoted = false;
     this.closedQuote = true;
+    this.start = index + 1;
     return false;
   }
 
-  private finishField(): void {
-    if (this.fields.length < MAX_COLUMNS) this.fields.push(this.field);
-    else this.error = `More than ${MAX_COLUMNS} columns`;
-    this.field = "";
-    this.closedQuote = false;
+  private append(value: string): void {
+    this.fieldLength += value.length;
+    if (this.fieldLength > MAX_TEXT_LENGTH) { this.error = "CSV field exceeds " + MAX_TEXT_LENGTH + " characters"; return; }
+    this.parts.push(value);
   }
 
-  private finishRecord(): void {
-    this.finishField();
+  private finishField(text: string, end: number): void {
+    if (!this.closedQuote) this.append(text.slice(this.start, end));
+    if (this.fields.length < MAX_COLUMNS) this.fields.push(this.parts.length === 1 ? this.parts[0] : this.parts.join(""));
+    else this.error = "More than " + MAX_COLUMNS + " columns";
+    this.parts = [];
+    this.fieldLength = 0;
+    this.closedQuote = false;
+    this.start = end + 1;
+  }
+
+  private finishRecord(text: string, end: number): void {
+    this.finishField(text, end);
     if (this.error || this.fields.some((field) => field.trim())) {
       this.records.push({ line: this.rowStart, fields: this.fields, ...(this.error ? { error: this.error } : {}) });
     }

@@ -37,6 +37,9 @@ Reads reject corrupt or future-version files loudly, never replacing them with
 an empty ledger. Version 1 is the initial schema; migration dispatch is explicit.
 Undo is one in-memory prior state for delete, category merge or import and is
 invalidated by the next successful mutation; restart clears it.
+If a write reports failure after replacement, the service reconciles the actual
+file with its prior and candidate states before retaining or replacing undo.
+Unknown or unreadable state clears undo; an error is still reported to the UI.
 
 ## Platform integration
 

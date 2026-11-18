@@ -42,12 +42,16 @@ function columnSelect(key: ColumnName, inspection: CsvInspection): string {
 function renderMapping(section: HTMLElement, context: ViewContext, file: CsvFile, inspection: CsvInspection): void {
   const work = requiredElement<HTMLElement>(section, "#import-work");
   work.innerHTML = `<div class="panel" data-geo="import-mapping"><h3>${escapeHtml(file.name)}</h3><p class="muted">Detected ${inspection.delimiter === "\t" ? "tab" : escapeHtml(inspection.delimiter)} delimiter · header line ${inspection.headerLine}</p>
-    <form id="mapping-form"><input type="hidden" name="headerRow" value="${inspection.headerRow}" /><div class="form-grid mapping-grid">
+    <form id="mapping-form"><label class="header-choice">Header line<select name="headerRow" aria-label="Header line">${inspection.headerCandidates.map((candidate) => `<option value="${candidate.index}" ${candidate.index === inspection.headerRow ? "selected" : ""}>Line ${candidate.line}: ${escapeHtml(candidate.label)}</option>`).join("")}</select></label><div class="form-grid mapping-grid">
     ${(Object.keys(COLUMN_LABELS) as ColumnName[]).map((name) => columnSelect(name, inspection)).join("")}
     <label>Date order<select name="dateOrder" aria-label="Date order"><option value="DMY">Day / month / year</option><option value="MDY">Month / day / year</option><option value="YMD">Year / month / day</option></select></label>
     <label>Decimal separator<select name="decimalSeparator" aria-label="Decimal separator"><option value=".">Dot (12.34)</option><option value=",">Comma (12,34)</option></select></label></div>
     <p class="muted">Choose a signed amount column, or leave it unmapped and choose both debit and credit columns.</p><div class="form-actions"><button class="primary" type="submit">Preview import</button><button type="button" id="cancel-import">Cancel import</button></div></form></div><div id="import-preview"></div>`;
   const form = requiredElement<HTMLFormElement>(work, "form");
+  requiredElement<HTMLSelectElement>(form, '[name="headerRow"]').onchange = (event) => {
+    try { renderMapping(section, context, file, inspectCsv(file.content, Number((event.currentTarget as HTMLSelectElement).value))); }
+    catch (error) { context.showError(error); }
+  };
   requiredElement<HTMLSelectElement>(form, '[name="dateOrder"]').value = inspection.mapping.dateOrder;
   requiredElement<HTMLSelectElement>(form, '[name="decimalSeparator"]').value = inspection.mapping.decimalSeparator;
   form.onchange = () => requiredElement(work, "#import-preview").replaceChildren();
@@ -76,7 +80,7 @@ function renderPreview(work: HTMLElement, context: ViewContext, file: CsvFile, m
   const rows = preview.accepted.slice(0, PREVIEW_ROW_LIMIT).map((item) => `<tr><td>${item.date}</td><td>${escapeHtml(item.payee)}</td><td>${escapeHtml(item.category ?? "Uncategorised")}</td><td class="money">${formatMoney(item.amount, context.view.ledger.currency)}</td></tr>`).join("");
   region.innerHTML = `<div class="panel" data-geo="import-preview"><h3>Preview</h3><p data-testid="import-counts">${preview.accepted.length} accepted · ${preview.duplicates} duplicates skipped · ${preview.errors.length} rejected</p>
     <div class="table-scroll"><table><caption class="sr-only">First accepted rows</caption><thead><tr><th>Date</th><th>Payee</th><th>Category</th><th class="money">Amount</th></tr></thead><tbody>${rows}</tbody></table></div>
-    ${preview.errors.length ? `<h3 class="diagnostic-title">Rejected rows</h3><ul class="diagnostics">${preview.errors.map((error) => `<li>Line ${error.line}: ${escapeHtml(error.reason)}</li>`).join("")}</ul>` : ""}
+    ${preview.errors.length ? `<h3 class="diagnostic-title">Rejected rows</h3><ul class="diagnostics" aria-label="Rejected rows">${preview.errors.map((error) => `<li>Line ${error.line}: ${escapeHtml(error.reason)}</li>`).join("")}</ul>` : ""}
     <p class="muted">All ${preview.accepted.length} accepted rows will be saved together. Rejected rows are excluded.</p><button type="button" class="primary" id="confirm-import" ${preview.accepted.length ? "" : "disabled"}>Confirm import</button></div>`;
   const button = requiredElement<HTMLButtonElement>(region, "#confirm-import");
   button.onclick = () => {

@@ -6,7 +6,7 @@ levels must be green on every Tier 1 platform before a row becomes done.
 
 | # | Slice | Done when | Levels | Owner | Status |
 |---|---|---|---|---|---|
-| 0 | Scaffold | electron-web template lint/unit/UI/real-shell and installer workflows green on windows-x64, macos-arm64, linux-x64; runner visual baselines reviewed; ledger links recorded | L0-L7 | solo | open |
+| 0 | Scaffold | electron-web template lint/unit/UI/real-shell and installer workflows green on windows-x64, macos-arm64, linux-x64; runner visual baselines reviewed; ledger links recorded | L0-L7 | solo | done |
 | 1 | Record transactions | add/edit/delete and newest-first list; safe integer money/currency settings; versioned atomic save survives restart; validation, contract parity, file failures, UI and real restart tests green | L0-L6 | solo | open |
 | 2 | Import a bank CSV | detected delimiter/header, mapped signed or debit/credit columns, date order and preview; line diagnostics, duplicate counts and atomic confirmation; CSV/import/UI/native-dialog-bypass tests green; 2,000 accepted rows under 5 seconds | L0-L6 | solo | open |
 | 3 | Categories and rules | create/rename/delete/merge and uncategorisation; ordered contains rules on import and explicit uncategorised application; category/domain/UI/contract tests green | L0-L5 | solo | open |

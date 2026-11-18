@@ -44,13 +44,17 @@ account, certificate, secret or payment was created or changed.
 
 ## Known defects
 
-Independent review pending. This draft makes no final defect-free claim.
+The independent read found three defects; each has a red/green regression and
+local fix, recorded in [BUG-HUNT.md](BUG-HUNT.md). Final independent re-check and
+hosted proof are pending. No identified defect is intentionally deferred.
 
 ## Limits and unverified work
 
-- CSV input is UTF-8 (BOM accepted), at most 20 MiB, with comma/semicolon/tab/pipe
-  delimiters and DMY/MDY/YMD numeric dates. Ambiguous formats require selecting
-  date/decimal mapping. Two-digit years use the recorded pivot.
+- CSV input is UTF-8 (BOM accepted), with comma/semicolon/tab/pipe delimiters and
+  DMY/MDY/YMD numeric dates. Ambiguous detection can be corrected with Header line;
+  date/decimal mapping is explicit. Two-digit years use the recorded pivot.
+  The arbitrary file-size cap was removed to preserve large export round trips;
+  large files need available memory. Text fields are bounded to 10,000 characters.
 - Six two-decimal currencies are supported. Settings relabel amounts without
   conversion; positive amounts are income and budgets compare gross spending.
   Undo is immediate, memory-only and clears on restart.

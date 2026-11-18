@@ -27,8 +27,7 @@ export class LedgerService implements LedgerApi {
       const candidate = deriveLedger(previous, command, this.createId);
       if (candidate === previous) return this.view(previous);
       const next = decodeLedger(candidate);
-      await this.persist(next);
-      this.undoState = UNDOABLE_COMMANDS.has(command.type) ? previous : undefined;
+      await this.persist(next, UNDOABLE_COMMANDS.has(command.type) ? previous : undefined);
       return this.view(next);
     });
   }
@@ -42,21 +41,34 @@ export class LedgerService implements LedgerApi {
     return { ledger: structuredClone(ledger), canUndo: this.undoState !== undefined };
   }
 
-  private async persist(ledger: Ledger): Promise<void> {
+  private async persist(ledger: Ledger, undoAfterCommit: Ledger | undefined): Promise<void> {
     try { await this.store.save(ledger); }
     catch (error) {
-      // A post-rename I/O error may have committed; reload before the next call.
-      this.current = undefined;
+      await this.reconcileFailedWrite(ledger, undoAfterCommit);
       throw error;
     }
     this.current = ledger;
+    this.undoState = undoAfterCommit;
+  }
+
+  /** A failed promise does not establish whether an atomic replacement committed. */
+  private async reconcileFailedWrite(candidate: Ledger, undoAfterCommit: Ledger | undefined): Promise<void> {
+    const before = this.current;
+    try {
+      const stored = decodeLedger(await this.store.load());
+      this.current = stored;
+      if (before && sameLedger(stored, before)) return;
+      this.undoState = sameLedger(stored, candidate) ? undoAfterCommit : undefined;
+    } catch {
+      this.current = undefined;
+      this.undoState = undefined;
+    }
   }
 
   private async undoLast(): Promise<LedgerView> {
     if (!this.undoState) throw new Error("No operation available to undo");
     const previous = this.undoState;
-    await this.persist(previous);
-    this.undoState = undefined;
+    await this.persist(previous, undefined);
     return this.view(previous);
   }
 
@@ -65,4 +77,9 @@ export class LedgerService implements LedgerApi {
     this.pending = result.then(() => undefined, () => undefined);
     return result;
   }
+}
+
+/** Time O(n), space O(n), on error paths only: compare canonical validated state. */
+function sameLedger(left: Ledger, right: Ledger): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
