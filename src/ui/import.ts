@@ -13,7 +13,7 @@ const COLUMN_LABELS: Record<ColumnName, string> = { date: "Date column", payee: 
 export function importView(context: ViewContext): HTMLElement {
   const section = document.createElement("section");
   section.innerHTML = `<div class="section-heading"><div><p class="eyebrow">BRING YOUR RECORDS</p><h2>Import a bank CSV</h2></div></div>
-    <div class="panel"><h3>Choose a file</h3><p class="muted">Map the columns, check the preview, then import accepted rows together. Duplicate rows are skipped.</p><button type="button" id="choose-csv">Choose CSV</button><input type="file" accept=".csv,.txt,text/csv" id="csv-input" hidden /></div><div id="import-work"></div>`;
+    <div class="panel" data-geo="import-file"><h3>Choose a file</h3><p class="muted">Map the columns, check the preview, then import accepted rows together. Duplicate rows are skipped.</p><button type="button" id="choose-csv">Choose CSV</button><input type="file" accept=".csv,.txt,text/csv" id="csv-input" hidden /></div><div id="import-work"></div>`;
   const input = requiredElement<HTMLInputElement>(section, "#csv-input");
   const prepare = (file: CsvFile): void => {
     const selected = csvFile(file);
@@ -42,7 +42,7 @@ function columnSelect(key: ColumnName, inspection: CsvInspection): string {
 
 function renderMapping(section: HTMLElement, context: ViewContext, file: CsvFile, inspection: CsvInspection): void {
   const work = requiredElement<HTMLElement>(section, "#import-work");
-  work.innerHTML = `<div class="panel"><h3>${escapeHtml(file.name)}</h3><p class="muted">Detected ${inspection.delimiter === "\t" ? "tab" : escapeHtml(inspection.delimiter)} delimiter · header line ${inspection.headerLine}</p>
+  work.innerHTML = `<div class="panel" data-geo="import-mapping"><h3>${escapeHtml(file.name)}</h3><p class="muted">Detected ${inspection.delimiter === "\t" ? "tab" : escapeHtml(inspection.delimiter)} delimiter · header line ${inspection.headerLine}</p>
     <form id="mapping-form"><input type="hidden" name="headerRow" value="${inspection.headerRow}" /><div class="form-grid mapping-grid">
     ${(Object.keys(COLUMN_LABELS) as ColumnName[]).map((name) => columnSelect(name, inspection)).join("")}
     <label>Date order<select name="dateOrder" aria-label="Date order"><option value="DMY">Day / month / year</option><option value="MDY">Month / day / year</option><option value="YMD">Year / month / day</option></select></label>
@@ -55,7 +55,7 @@ function renderMapping(section: HTMLElement, context: ViewContext, file: CsvFile
   form.onsubmit = (event) => {
     event.preventDefault();
     try {
-      const mapping = mappingFromForm(form);
+      const mapping = mappingFromForm(form, inspection.mapping.tallyId);
       renderPreview(work, context, file, mapping, previewCsv(context.view.ledger, file.content, mapping));
     } catch (error) { context.showError(error); }
   };
@@ -65,9 +65,9 @@ function renderMapping(section: HTMLElement, context: ViewContext, file: CsvFile
   };
 }
 
-function mappingFromForm(form: HTMLFormElement): CsvMapping {
+function mappingFromForm(form: HTMLFormElement, tallyId: number | null | undefined): CsvMapping {
   const column = (name: string): number | null => { const value = fieldValue(form, name); return value === "" ? null : Number(value); };
-  return csvMapping({ headerRow: Number(fieldValue(form, "headerRow")), date: column("date"), payee: column("payee"),
+  return csvMapping({ ...(tallyId === undefined ? {} : { tallyId }), headerRow: Number(fieldValue(form, "headerRow")), date: column("date"), payee: column("payee"),
     amount: column("amount"), debit: column("debit"), credit: column("credit"), category: column("category"), note: column("note"),
     dateOrder: fieldValue(form, "dateOrder"), decimalSeparator: fieldValue(form, "decimalSeparator") });
 }
@@ -75,7 +75,7 @@ function mappingFromForm(form: HTMLFormElement): CsvMapping {
 function renderPreview(work: HTMLElement, context: ViewContext, file: CsvFile, mapping: CsvMapping, preview: ImportPreview): void {
   const region = requiredElement<HTMLElement>(work, "#import-preview");
   const rows = preview.accepted.slice(0, PREVIEW_ROW_LIMIT).map((item) => `<tr><td>${item.date}</td><td>${escapeHtml(item.payee)}</td><td>${escapeHtml(item.category ?? "Uncategorised")}</td><td class="money">${formatMoney(item.amount, context.view.ledger.currency)}</td></tr>`).join("");
-  region.innerHTML = `<div class="panel"><h3>Preview</h3><p data-testid="import-counts">${preview.accepted.length} accepted · ${preview.duplicates} duplicates skipped · ${preview.errors.length} rejected</p>
+  region.innerHTML = `<div class="panel" data-geo="import-preview"><h3>Preview</h3><p data-testid="import-counts">${preview.accepted.length} accepted · ${preview.duplicates} duplicates skipped · ${preview.errors.length} rejected</p>
     <div class="table-scroll"><table><caption class="sr-only">First accepted rows</caption><thead><tr><th>Date</th><th>Payee</th><th>Category</th><th class="money">Amount</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${preview.errors.length ? `<h3 class="diagnostic-title">Rejected rows</h3><ul class="diagnostics">${preview.errors.map((error) => `<li>Line ${error.line}: ${escapeHtml(error.reason)}</li>`).join("")}</ul>` : ""}
     <p class="muted">All ${preview.accepted.length} accepted rows will be saved together. Rejected rows are excluded.</p><button type="button" class="primary" id="confirm-import" ${preview.accepted.length ? "" : "disabled"}>Confirm import</button></div>`;

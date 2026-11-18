@@ -10,7 +10,7 @@ let selectedMonth = today().slice(0, 7);
 export function summaryView(context: ViewContext): HTMLElement {
   const section = document.createElement("section");
   section.innerHTML = `<div class="section-heading"><div><p class="eyebrow">THE MONTH AT A GLANCE</p><h2>Monthly summary</h2></div></div>
-    <div class="month-controls"><button type="button" id="previous-month">Previous month</button><label>Month<input type="month" id="month" min="0001-01" max="9999-12" value="${selectedMonth}" /></label><button type="button" id="next-month">Next month</button></div><div id="month-details"></div>`;
+    <div class="month-controls" data-geo="month-nav"><button type="button" id="previous-month">Previous month</button><label>Month<input type="month" id="month" min="0001-01" max="9999-12" value="${selectedMonth}" /></label><button type="button" id="next-month">Next month</button></div><div id="month-details"></div>`;
   const input = requiredElement<HTMLInputElement>(section, "#month");
   const changeMonth = (month: string): void => {
     calendarDate(`${month}-01`);
@@ -28,13 +28,13 @@ export function summaryView(context: ViewContext): HTMLElement {
 function metrics(summary: MonthlySummary, currency: string): string {
   const values = [{ label: "Income", key: "income", amount: summary.income },
     { label: "Spending", key: "spending", amount: summary.spending }, { label: "Net", key: "net", amount: summary.net }];
-  return `<div class="metric-grid">${values.map((metric) => `<div class="panel metric"><h3>${metric.label}</h3><strong data-testid="summary-${metric.key}">${formatMoney(metric.amount, currency)}</strong></div>`).join("")}</div>`;
+  return `<div class="metric-grid" data-geo="summary-metrics">${values.map((metric) => `<div class="panel metric"><h3>${metric.label}</h3><strong data-testid="summary-${metric.key}">${formatMoney(metric.amount, currency)}</strong></div>`).join("")}</div>`;
 }
 
 function renderMonth(section: HTMLElement, context: ViewContext): void {
   const summary = summarizeMonth(context.view.ledger, selectedMonth);
   const details = requiredElement<HTMLElement>(section, "#month-details");
-  details.innerHTML = `${metrics(summary, context.view.ledger.currency)}<div class="panel"><h3>Category totals</h3><p class="muted">${summary.transactionCount} transactions this month. Budgets compare gross spending; positive amounts are income.</p>
+  details.innerHTML = `${metrics(summary, context.view.ledger.currency)}<div class="panel" data-geo="summary-categories"><h3>Category totals</h3><p class="muted">${summary.transactionCount} transactions this month. Budgets compare gross spending; positive amounts are income.</p>
     <div class="table-scroll"><table><caption class="sr-only">Category totals for ${selectedMonth}</caption><thead><tr><th>Category</th><th class="money">Income</th><th class="money">Spending</th><th class="money">Net</th><th>Monthly budget</th><th class="money">Left / over</th></tr></thead><tbody></tbody></table></div>
     ${summary.categories.length ? "" : '<p class="empty">No transactions this month. Create categories to set budgets.</p>'}</div>`;
   const body = requiredElement<HTMLTableSectionElement>(details, "tbody");

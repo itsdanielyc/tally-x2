@@ -20,7 +20,6 @@ export interface ElectronBridge {
   pickCsv(): Promise<CsvFile | null>;
   snapshot(): Promise<LedgerView>;
   execute(command: LedgerCommand): Promise<LedgerView>;
-  greet(name: string): Promise<string>;
   platformInfo(): Promise<PlatformInfo>;
 }
 
@@ -30,6 +29,5 @@ export const channels = {
   pickCsv: "csv:pick",
   snapshot: "ledger:snapshot",
   execute: "ledger:execute",
-  greet: "app:greet",
   platformInfo: "app:platform-info",
 } as const;

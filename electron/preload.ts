@@ -8,7 +8,6 @@ const bridge: ElectronBridge = {
   pickCsv: () => ipcRenderer.invoke(channels.pickCsv),
   snapshot: () => ipcRenderer.invoke(channels.snapshot),
   execute: (command) => ipcRenderer.invoke(channels.execute, command),
-  greet: (name) => ipcRenderer.invoke(channels.greet, name),
   platformInfo: () => ipcRenderer.invoke(channels.platformInfo),
 };
 

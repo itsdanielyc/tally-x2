@@ -1,13 +1,14 @@
 import { csvMapping, type CsvMapping } from "../contracts/csv";
 import type { Ledger, LedgerCommand, TransactionDraft } from "../contracts/ledger";
-import { transactionDraft } from "../contracts/primitives";
+import { textValue, transactionDraft } from "../contracts/primitives";
 import { detectCsv, suggestMapping } from "./csv-inspect";
 import { csvAmount, csvDate } from "./csv-values";
 import type { CsvRecord } from "./csv-reader";
 import { ruleMatcher } from "./rules";
 
 export interface CsvInspection { delimiter: string; headers: string[]; headerRow: number; headerLine: number; mapping: CsvMapping }
-export interface ImportPreview { accepted: TransactionDraft[]; duplicates: number; errors: { line: number; reason: string }[] }
+interface ImportedTransaction extends TransactionDraft { id?: string }
+export interface ImportPreview { accepted: ImportedTransaction[]; duplicates: number; errors: { line: number; reason: string }[] }
 
 /** Inspect once for the mapping UI; preview and confirmation use the same detector. */
 export function inspectCsv(source: string): CsvInspection {
@@ -34,11 +35,27 @@ function mappedAmount(record: CsvRecord, mapping: CsvMapping): number {
   return credit - debit;
 }
 
-function readTransaction(record: CsvRecord, mapping: CsvMapping, columns: number): TransactionDraft {
+function readTransaction(record: CsvRecord, mapping: CsvMapping, columns: number): ImportedTransaction {
   if (record.error) throw new Error(record.error);
   if (record.fields.length !== columns) throw new Error(`Expected ${columns} columns, found ${record.fields.length}`);
-  return transactionDraft({ date: csvDate(field(record, mapping.date), mapping.dateOrder), payee: field(record, mapping.payee),
-    amount: mappedAmount(record, mapping), category: field(record, mapping.category) || null, note: field(record, mapping.note) });
+  return { ...transactionDraft({ date: csvDate(field(record, mapping.date), mapping.dateOrder), payee: field(record, mapping.payee),
+    amount: mappedAmount(record, mapping), category: field(record, mapping.category) || null, note: field(record, mapping.note) }),
+    ...(mapping.tallyId == null ? {} : { id: textValue(field(record, mapping.tallyId), "Tally ID") }) };
+}
+
+function isDuplicate(transaction: ImportedTransaction, identities: Set<string>, bankRows: Set<string>, identifiers: Map<string, string>): boolean {
+  const key = duplicateKey(transaction);
+  if (identities.has(key)) return true;
+  if (transaction.id === undefined) {
+    if (bankRows.has(key)) return true;
+  } else {
+    const previous = identifiers.get(transaction.id);
+    if (previous === key) return true;
+    if (previous !== undefined) throw new Error("Tally ID conflicts with a different transaction");
+    identifiers.set(transaction.id, key);
+  }
+  bankRows.add(key);
+  return false;
 }
 
 /** Time O(n+m), space O(n+m): exact identity Set prevents quadratic duplicate scans. */
@@ -47,16 +64,16 @@ export function previewCsv(ledger: Ledger, source: string, options: CsvMapping):
   const document = detectCsv(source);
   const header = document.records[mapping.headerRow];
   if (!header) throw new Error("CSV has no header row");
-  const seen = new Set(ledger.transactions.map(duplicateKey));
+  const identities = new Set(ledger.transactions.map(duplicateKey));
+  const bankRows = new Set<string>();
+  const identifiers = new Map(ledger.transactions.map((item) => [item.id, duplicateKey(item)]));
   const match = ruleMatcher(ledger.rules);
   const preview: ImportPreview = { accepted: [], duplicates: 0, errors: [] };
   for (let index = mapping.headerRow + 1; index < document.records.length; index++) {
     const record = document.records[index];
     try {
       const transaction = readTransaction(record, mapping, header.fields.length);
-      const key = duplicateKey(transaction);
-      if (seen.has(key)) { preview.duplicates++; continue; }
-      seen.add(key);
+      if (isDuplicate(transaction, identities, bankRows, identifiers)) { preview.duplicates++; continue; }
       transaction.category ??= match(transaction.payee);
       preview.accepted.push(transaction);
     } catch (error) {
@@ -74,7 +91,7 @@ export function importCsv(ledger: Ledger, command: Extract<LedgerCommand, { type
   const transactions = preview.accepted.map((transaction) => {
     const category = transaction.category;
     if (category !== null) categories.add(category);
-    return { ...transaction, category, id: createId() };
+    return { ...transaction, category, id: transaction.id ?? createId() };
   });
   return { ...ledger, categories: [...categories], transactions: [...transactions, ...ledger.transactions] };
 }

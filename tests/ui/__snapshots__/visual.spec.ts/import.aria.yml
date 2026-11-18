@@ -1,0 +1,102 @@
+- main:
+  - heading "Tally" [level=1]
+  - paragraph: Your money, kept local.
+  - text: mock
+  - navigation "Workspace":
+    - button "Transactions"
+    - button "Import CSV"
+    - button "Categories"
+    - button "Monthly summary"
+  - status: Transaction saved
+  - button "Undo" [disabled]
+  - paragraph: BRING YOUR RECORDS
+  - heading "Import a bank CSV" [level=2]
+  - heading "Choose a file" [level=3]
+  - paragraph: Map the columns, check the preview, then import accepted rows together. Duplicate rows are skipped.
+  - button "Choose CSV"
+  - heading "visual.csv" [level=3]
+  - paragraph: Detected ; delimiter · header line 1
+  - text: Date column
+  - combobox "Date column":
+    - option "Unmapped"
+    - option "1 · Date" [selected]
+    - option "2 · Payee"
+    - option "3 · Debit"
+    - option "4 · Credit"
+  - text: Payee column
+  - combobox "Payee column":
+    - option "Unmapped"
+    - option "1 · Date"
+    - option "2 · Payee" [selected]
+    - option "3 · Debit"
+    - option "4 · Credit"
+  - text: Signed amount column
+  - combobox "Signed amount column":
+    - option "Unmapped" [selected]
+    - option "1 · Date"
+    - option "2 · Payee"
+    - option "3 · Debit"
+    - option "4 · Credit"
+  - text: Debit column
+  - combobox "Debit column":
+    - option "Unmapped"
+    - option "1 · Date"
+    - option "2 · Payee"
+    - option "3 · Debit" [selected]
+    - option "4 · Credit"
+  - text: Credit column
+  - combobox "Credit column":
+    - option "Unmapped"
+    - option "1 · Date"
+    - option "2 · Payee"
+    - option "3 · Debit"
+    - option "4 · Credit" [selected]
+  - text: Category column
+  - combobox "Category column":
+    - option "Unmapped" [selected]
+    - option "1 · Date"
+    - option "2 · Payee"
+    - option "3 · Debit"
+    - option "4 · Credit"
+  - text: Note column
+  - combobox "Note column":
+    - option "Unmapped" [selected]
+    - option "1 · Date"
+    - option "2 · Payee"
+    - option "3 · Debit"
+    - option "4 · Credit"
+  - text: Date order
+  - combobox "Date order":
+    - option "Day / month / year" [selected]
+    - option "Month / day / year"
+    - option "Year / month / day"
+  - text: Decimal separator
+  - combobox "Decimal separator":
+    - option /Dot \(\d+\.\d+\)/
+    - option /Comma \(\d+,\d+\)/ [selected]
+  - paragraph: Choose a signed amount column, or leave it unmapped and choose both debit and credit columns.
+  - button "Preview import"
+  - button "Cancel import"
+  - heading "Preview" [level=3]
+  - paragraph: 1 accepted · 0 duplicates skipped · 1 rejected
+  - table "First accepted rows":
+    - caption: First accepted rows
+    - rowgroup:
+      - row "Date Payee Category Amount":
+        - columnheader "Date"
+        - columnheader "Payee"
+        - columnheader "Category"
+        - columnheader "Amount"
+    - rowgroup:
+      - row /\d+-\d+-\d+ Coffee Uncategorised GBP -\d+\.\d+/:
+        - cell /\d+-\d+-\d+/
+        - cell "Coffee"
+        - cell "Uncategorised"
+        - cell /GBP -\d+\.\d+/
+  - heading "Rejected rows" [level=3]
+  - list:
+    - listitem: "Line 3: Date is not a valid calendar date"
+  - paragraph: All 1 accepted rows will be saved together. Rejected rows are excluded.
+  - button "Confirm import"
+  - group: Settings
+  - text: mock / mock

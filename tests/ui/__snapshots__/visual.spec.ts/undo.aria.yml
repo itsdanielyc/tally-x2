@@ -1,0 +1,55 @@
+- main:
+  - heading "Tally" [level=1]
+  - paragraph: Your money, kept local.
+  - text: mock
+  - navigation "Workspace":
+    - button "Transactions"
+    - button "Import CSV"
+    - button "Categories"
+    - button "Monthly summary"
+  - status: Transaction deleted
+  - button "Undo"
+  - paragraph: YOUR LEDGER
+  - heading "Transactions" [level=2]
+  - text: 1 recorded
+  - heading "Add transaction" [level=3]
+  - form "Add transaction":
+    - text: Date
+    - textbox "Date": /\d+-\d+-\d+/
+    - text: Payee
+    - textbox "Payee":
+      - /placeholder: Where did it go?
+    - text: Amount
+    - textbox "Amount":
+      - /placeholder: "-12.34"
+    - text: Spending − · income + Category (optional)
+    - combobox "Category (optional)"
+    - text: Note (optional)
+    - textbox "Note (optional)"
+    - button "Save transaction"
+  - heading "Your transactions" [level=3]
+  - text: 1 shown · 1 total
+  - button "Export shown"
+  - group: Find transactions
+  - table "Transactions, newest first":
+    - caption: Transactions, newest first
+    - rowgroup:
+      - row "Date Payee / note Category Amount Actions":
+        - columnheader "Date"
+        - columnheader "Payee / note"
+        - columnheader "Category"
+        - columnheader "Amount"
+        - columnheader "Actions"
+    - rowgroup:
+      - row /\d+-\d+-\d+ Employer Salary Income GBP \d+\.\d+ Edit Employer Delete Employer/:
+        - cell /\d+-\d+-\d+/
+        - cell "Employer Salary":
+          - strong: Employer
+          - text: ""
+        - cell "Income"
+        - cell /GBP \d+\.\d+/
+        - cell "Edit Employer Delete Employer":
+          - button "Edit Employer"
+          - button "Delete Employer"
+  - group: Settings
+  - text: mock / mock

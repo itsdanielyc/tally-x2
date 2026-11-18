@@ -1,13 +1,15 @@
 import { escapeHtml, fieldValue, requiredElement } from "./dom";
 import type { ViewContext } from "./context";
+import { MAX_TEXT_LENGTH } from "../../contracts/primitives";
 
 /** Ordered, visible rules share the same category names as the ledger. */
 export function rulesView(context: ViewContext): HTMLElement {
   const panel = document.createElement("div");
   panel.className = "panel";
+  panel.dataset.geo = "rules";
   const { categories, rules } = context.view.ledger;
   panel.innerHTML = `<h3>Payee rules</h3><p class="muted">The first matching rule wins, ignoring letter case. Explicit categories are kept. Imports use these rules automatically.</p>
-    <form id="rule-form"><div class="form-grid"><label class="span-two">Payee contains<input name="contains" required maxlength="10000" /></label>
+    <form id="rule-form"><div class="form-grid"><label class="span-two">Payee contains<input name="contains" required maxlength="${MAX_TEXT_LENGTH}" /></label>
     <label>Rule category<select name="category" aria-label="Rule category" required>${categories.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")}</select></label></div>
     <div class="form-actions"><button type="submit" class="primary" ${categories.length ? "" : "disabled"}>Save rule</button><button id="cancel-rule" type="button" hidden>Cancel rule edit</button></div></form>
     ${categories.length ? "" : '<p class="muted">Create a category first.</p>'}<ul class="management-list" id="rule-list"></ul>

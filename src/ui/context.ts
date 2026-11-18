@@ -5,4 +5,5 @@ export interface ViewContext {
   view: LedgerView;
   perform(command: LedgerCommand, message: string): Promise<void>;
   showError(error: unknown): void;
+  announce(message: string): void;
 }

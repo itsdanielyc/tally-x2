@@ -1,0 +1,73 @@
+- main:
+  - heading "Tally" [level=1]
+  - paragraph: Your money, kept local.
+  - text: mock
+  - navigation "Workspace":
+    - button "Transactions"
+    - button "Import CSV"
+    - button "Categories"
+    - button "Monthly summary"
+  - status: Showing 1 transactions
+  - button "Undo" [disabled]
+  - paragraph: YOUR LEDGER
+  - heading "Transactions" [level=2]
+  - text: 2 recorded
+  - heading "Add transaction" [level=3]
+  - form "Add transaction":
+    - text: Date
+    - textbox "Date": /\d+-\d+-\d+/
+    - text: Payee
+    - textbox "Payee":
+      - /placeholder: Where did it go?
+    - text: Amount
+    - textbox "Amount":
+      - /placeholder: "-12.34"
+    - text: Spending − · income + Category (optional)
+    - combobox "Category (optional)"
+    - text: Note (optional)
+    - textbox "Note (optional)"
+    - button "Save transaction"
+  - heading "Your transactions" [level=3]
+  - text: 1 shown · 2 total
+  - button "Export shown"
+  - group:
+    - text: Find transactions Search payee or note
+    - textbox "Search payee or note": Weekly
+    - text: Filter category
+    - combobox "Filter category":
+      - option "All categories" [selected]
+      - option "Uncategorised"
+      - option "Food"
+      - option "Income"
+    - text: From date
+    - textbox "From date"
+    - text: To date
+    - textbox "To date"
+    - text: Minimum amount
+    - textbox "Minimum amount"
+    - text: Maximum amount
+    - textbox "Maximum amount"
+    - button "Apply filters"
+    - button "Clear filters"
+  - table "Transactions, newest first":
+    - caption: Transactions, newest first
+    - rowgroup:
+      - row "Date Payee / note Category Amount Actions":
+        - columnheader "Date"
+        - columnheader "Payee / note"
+        - columnheader "Category"
+        - columnheader "Amount"
+        - columnheader "Actions"
+    - rowgroup:
+      - row /\d+-\d+-\d+ Grocer Weekly Food GBP -\d+\.\d+ Edit Grocer Delete Grocer/:
+        - cell /\d+-\d+-\d+/
+        - cell "Grocer Weekly":
+          - strong: Grocer
+          - text: ""
+        - cell "Food"
+        - cell /GBP -\d+\.\d+/
+        - cell "Edit Grocer Delete Grocer":
+          - button "Edit Grocer"
+          - button "Delete Grocer"
+  - group: Settings
+  - text: mock / mock
