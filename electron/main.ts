@@ -5,6 +5,8 @@
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { join } from "node:path";
 import { channels, type PlatformInfo } from "./bridge";
+import { emptyLedger } from "../contracts/ledger";
+import { decodeLedger, validateCommand } from "../contracts/validation";
 
 function greet(name: string): string {
   return `Hello, ${name}! You've been greeted from the main process!`;
@@ -45,6 +47,11 @@ function createWindow(): void {
 }
 
 function start(): void {
+  ipcMain.handle(channels.snapshot, () => ({ ledger: decodeLedger(emptyLedger()), canUndo: false }));
+  ipcMain.handle(channels.execute, (_event, command: unknown) => {
+    validateCommand(command);
+    throw new Error("Ledger storage is not connected yet");
+  });
   ipcMain.handle(channels.greet, (_e, name: unknown) => greet(String(name)));
   ipcMain.handle(channels.platformInfo, () => platformInfo());
   createWindow();
