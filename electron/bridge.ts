@@ -2,6 +2,7 @@
 // The renderer imports only these types; the preload and main implement them.
 import type { LedgerCommand, LedgerView } from "../contracts/ledger";
 import type { CsvFile } from "../contracts/csv";
+import type { ExportReceipt, TransactionFilter } from "../contracts/find";
 
 export type PlatformInfo = {
   /** process.platform in the main process: win32 | darwin | linux */
@@ -15,6 +16,7 @@ export type PlatformInfo = {
 };
 
 export interface ElectronBridge {
+  exportCsv(filter: TransactionFilter): Promise<ExportReceipt | null>;
   pickCsv(): Promise<CsvFile | null>;
   snapshot(): Promise<LedgerView>;
   execute(command: LedgerCommand): Promise<LedgerView>;
@@ -24,6 +26,7 @@ export interface ElectronBridge {
 
 /** IPC channel names, shared by main and preload. */
 export const channels = {
+  exportCsv: "csv:export",
   pickCsv: "csv:pick",
   snapshot: "ledger:snapshot",
   execute: "ledger:execute",

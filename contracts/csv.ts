@@ -4,6 +4,7 @@ export const MAX_CSV_BYTES = 20 * 1024 * 1024;
 const MAX_COLUMN_INDEX = 999;
 export interface CsvFile { name: string; content: string }
 export interface CsvMapping {
+  tallyId?: number | null;
   headerRow: number;
   date: number;
   payee: number;
@@ -41,6 +42,7 @@ export function csvMapping(value: unknown): CsvMapping {
   const debit = optionalColumn(mapping.debit);
   const credit = optionalColumn(mapping.credit);
   if (amount === null && (debit === null || credit === null)) throw new Error("Map a signed amount or both debit and credit columns");
-  return { headerRow, date: columnIndex(mapping.date), payee: columnIndex(mapping.payee), amount, debit, credit,
+  return { ...(mapping.tallyId === undefined ? {} : { tallyId: optionalColumn(mapping.tallyId) }),
+    headerRow, date: columnIndex(mapping.date), payee: columnIndex(mapping.payee), amount, debit, credit,
     category: optionalColumn(mapping.category), note: optionalColumn(mapping.note), dateOrder, decimalSeparator };
 }

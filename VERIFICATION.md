@@ -26,3 +26,5 @@ is never rounded up to "tested"; anything not listed here is unverified.
 | 2026-11-18 17:35 UTC | L0/L1 budget contract preparation | Validated calendar months, nonnegative integer budgets, zero and removal | local windows-x64 | lint and unit exit 0; positive budget command first observed red as Unknown ledger command. |
 
 | 2026-11-18 17:40 UTC | L0-L5 summary local preparation | Exact category/month income, spending, net and budgets, leap/year boundaries and totals beyond safe numeric sums | local windows-x64 | lint exit 0; unit 50 passed; 6 browser journeys passed. Red: zero totals vs 9898 minor units, wrong year rollover, unknown budget command, missing summary control; negative-budget bypass failed to throw. Summary image reviewed. Hosted L5 pending. |
+
+| 2026-11-18 17:45 UTC | L0/L1 find/export/undo contract preparation | Inclusive filter validation, export receipt and one undo payload | local windows-x64 | lint and unit exit 0; red: filters returned defaults instead of supplied fields; reversed bounds failed to throw; then green. |
