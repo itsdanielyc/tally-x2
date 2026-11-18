@@ -34,3 +34,5 @@ Ruling: combine L0-L6 commands in one hosted job per Tier 1 OS  -  repeated macO
 Ruling: CSV supports UTF-8 with BOM, comma/semicolon/tab/pipe, 20 MiB bound, and two-digit years 00-69 as 2000-2069 and 70-99 as 1970-1999 - deterministic bank formats without guessing an unsupported encoding - cost if wrong: select date order or use a UTF-8 export. Accepted rows commit together; diagnostic rows stay excluded.
 
 Ruling: first case-insensitive contains rule wins; explicit categories take precedence; deleting a category removes its rules and budgets, and merging sums matching monthly budgets - preserves intentional classification and keeps references valid - cost if wrong: later rule-priority controls would be another slice.
+
+Ruling: budgets compare gross negative outflows and positive entries are income; net totals are shown separately, and each month has independent budgets - the transaction schema has no refund kind - cost if wrong: refund treatment needs a later explicit product decision. Summary accumulation uses BigInt so valid individual amounts never overflow monthly totals.
