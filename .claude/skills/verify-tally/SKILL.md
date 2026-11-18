@@ -48,3 +48,29 @@ Read cold, mid-task. Every command below is real for this repository.
 - Kill only what you started (the suite does this; after a manual launch,
   close the window or kill the one PID you recorded).
 - Evidence (`artifacts/`) survives cleanup and is gitignored.
+
+<!-- keel:start -->
+## Tally journeys (supersedes the scaffold greeting sample)
+
+`npm run build` then `npm run test:e2e` drives the native bridge, sandbox,
+platform, transaction restart, native CSV preview/import, multiline-note edit,
+filtered export and exact import into an empty ledger. Fixtures and test data
+live under this worktree's `artifacts/`; helpers close the instances they start.
+
+The browser suite owns strict port 21427 and never reuses another server.
+`npm run test:ui` checks the labelled mock. Home and five populated states use
+shared ARIA, 8px geometry and runner-captured per-OS pixels. Refresh local ARIA
+and geometry only with `UPDATE_SNAPSHOTS=1` and a tier-1/tier-2 grep; PNGs must
+come from the snapshots workflow.
+
+`TALLY_DATA_DIR` isolates the ledger. Unpackaged native-dialog tests use
+`TALLY_IMPORT_PATH` and `TALLY_EXPORT_PATH`; no driver or fixtures ship in the
+binary. The L7 external driver runs installed binaries, verifies isPackaged,
+opens a saved file, writes, restarts and screenshots before uninstalling.
+These environment paths are fixture overrides, not product settings.
+
+Version: `npm run check:version`. Final pre-tag proof:
+`npm run check:release -- <tested-candidate-sha>`. Never create a tag/release
+without a later user instruction. No cleanup may touch another app or a path
+outside this worktree during this task.
+<!-- keel:end -->

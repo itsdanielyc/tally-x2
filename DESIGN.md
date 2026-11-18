@@ -9,4 +9,8 @@
 - The browser test surface always displays a Mock badge; desktop displays Native.
 - Empty states explain the next useful action. Destructive actions are explicit;
   undo feedback remains available immediately after eligible operations.
+- Search/filter controls collapse under Find transactions and keep their values
+  across list refreshes; export always uses the currently applied query.
+- Notes use a multiline editor. DOM newline normalization must preserve untouched
+  imported payee/category/note strings when another field is edited.
 <!-- keel:end -->

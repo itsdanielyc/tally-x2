@@ -15,7 +15,7 @@
     "lint": "npm run lint",
     "unit": "npm run test:unit",
     "contracts": "npm run test:unit",
-    "integration": null,
+    "integration": "npm run test:unit",
     "ui": "npm run test:ui",
     "e2e": "npm run test:e2e",
     "build": "npm run build",

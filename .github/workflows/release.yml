@@ -1,0 +1,56 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  gate:
+    name: proven commit and version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node scripts/check-version.mjs
+      - name: Require pre-tag CI and installers for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/release-gate.mjs
+      - name: Require a commit on main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+  bundles:
+    name: build and install from tag
+    needs: [gate]
+    uses: ./.github/workflows/installers.yml
+    permissions:
+      contents: read
+  publish:
+    name: publish verified bundles
+    needs: [bundles]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: bundles-*
+          path: assets
+          merge-multiple: true
+      - name: Read this version's changelog
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v version="$version" '/^## / { if (printing) exit; printing=index($0,"[" version "]")>0 } printing' CHANGELOG.md > notes.md
+          test -s notes.md
+      - name: Create release after every round trip passed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          case "$GITHUB_REF_NAME" in v0.*) prerelease="--prerelease";; esac
+          gh release create "$GITHUB_REF_NAME" assets/* --title "$GITHUB_REF_NAME" --notes-file notes.md $prerelease

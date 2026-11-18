@@ -11,3 +11,40 @@ npm run test:ui        # Playwright, chromium, against the labelled mock
 npm run build          # main, preload and renderer into out/ for the real-shell suite
 npm run test:e2e       # Playwright's Electron launcher against the built app
 ```
+
+<!-- keel:start -->
+## Tally 0.1.0
+
+An offline expense ledger for one person: record transactions, map a bank CSV,
+organise categories/rules, compare months against budgets, find records, export
+the shown set and undo one immediate destructive change.
+
+Run the desktop app with `npm ci`, `npm run build`, then `npm start`. The browser
+command is a labelled test mock and does not persist household data. A desktop
+page without its native bridge refuses to use that mock.
+
+`ledger.json` lives in Electron's per-user `tally` data directory: Windows
+AppData/Roaming, macOS Library/Application Support, or Linux XDG_CONFIG_HOME
+(normally ~/.config). No network service or account is used. Close the app
+before copying that file as a backup; do not edit it while Tally runs.
+
+Enter spending with a minus sign and income as positive. Supported currencies
+have two decimal places. CSV import supports UTF-8, common delimiters, signed
+amounts or debit/credit columns, numeric date orders and decimal commas. Rejected
+rows name their physical line. Tally exports add stable IDs so separate purchases
+with the same date/payee/amount remain separate when imported again.
+
+Undo covers the most recent transaction/category delete, category merge or
+accepted-row import. Another successful data change replaces or clears it;
+search, navigation and export do not. Restart clears undo. Category deletion
+leaves records uncategorised; merging retargets rules and combines budgets.
+The first matching payee rule wins.
+
+Candidate bundles and checksums come from the `installers` workflow: NSIS for
+Windows x64, DMG for macOS arm64, deb/AppImage for Linux x64. They are unsigned
+and not notarized; expected warnings and limits are in
+[release notes](docs/RELEASE-NOTES.md). No tag or GitHub release is created here.
+
+Evidence: [VERIFICATION.md](VERIFICATION.md). Fixed scope: [SLICES.md](SLICES.md).
+Architecture and test strategy: ARCHITECTURE.md and TESTING.md.
+<!-- keel:end -->

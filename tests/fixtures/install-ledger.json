@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "currency": "GBP",
+  "transactions": [
+    { "id": "installer-fixture", "date": "2026-01-15", "payee": "Installer record", "amount": -123, "category": null, "note": "Saved before installation" }
+  ],
+  "categories": [],
+  "rules": [],
+  "budgets": []
+}

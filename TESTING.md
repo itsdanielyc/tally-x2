@@ -17,22 +17,29 @@ Tier 1 is windows-x64, macos-arm64 and linux-x64, exactly as in keel.json.
 L0-L3 run on all three to catch filesystem differences; L4-L7 run on all three.
 Browser builds are test surfaces only. No bank service or network dependency.
 
-## Critical journeys (planned; evidence is in VERIFICATION.md)
+## Critical journeys (required proof; evidence is in VERIFICATION.md)
 
-| Journey | Planned proof |
+| Journey | Test entry points |
 |---|---|
 | Add, edit, delete, money validation | L1 `tests/unit/transactions.test.ts`; L4 `tests/ui/transactions.spec.ts` |
-| Save and reopen, corrupt file, failed write | L3 `tests/unit/persistence.test.ts`; L6 `tests/e2e/app.spec.ts` |
-| Mock/backend parity and invalid payloads | L2 `tests/unit/contract.test.ts` |
+| Save and reopen, corrupt file, failed write | L3 `tests/unit/persistence.test.ts`; L6 `tests/e2e/transactions.spec.ts` |
+| Mock/backend parity and invalid payloads | L2 `tests/unit/ledger-contract.test.ts`, `tests/unit/schema.test.ts` and feature contract suites |
 | CSV preview, diagnostics, duplicates, atomic import, 2,000 rows | L1 `tests/unit/csv.test.ts`; L3 `tests/unit/import.test.ts`; L4 `tests/ui/import.spec.ts`; L6 `tests/e2e/import.spec.ts` |
 | Categories, merge, rules | L1 `tests/unit/categories.test.ts`; L4 `tests/ui/categories.spec.ts` |
 | Month boundaries, income/spending and budgets | L1 `tests/unit/summary.test.ts`; L4 `tests/ui/summary.spec.ts` |
-| Search/filter/export round trip and one-step undo | L1 `tests/unit/find.test.ts`; L3 `tests/unit/export.test.ts`; L4 `tests/ui/find.spec.ts`; L6 `tests/e2e/export.spec.ts` |
+| Search/filter/export round trip and one-step undo | L1 `tests/unit/find.test.ts`, `tests/unit/undo.test.ts`; L3 `tests/unit/export.test.ts`; L4 `tests/ui/find.spec.ts`; L6 `tests/e2e/export.spec.ts` |
+| Installed saved-file/write/restart/uninstall | L7 `scripts/installed-smoke.mjs`, `scripts/installer-test.ps1`, `scripts/installer-test.sh` |
 
 Visual tiers: shared ARIA structure, shared geometry with 8px tolerance, and
 runner-captured per-OS pixels with maximum differing ratio 0.002. Home/empty
-and populated feature states are checked by `tests/ui/home.spec.ts` and feature
-specs. PNG changes come through the snapshots workflow and receive visual review.
+and five populated feature states are checked at all three visual tiers by
+`tests/ui/home.spec.ts` and `tests/ui/visual.spec.ts`. PNG changes come through
+the snapshots workflow and receive visual review. Each capture artifact keeps
+only its own OS's pixels (`tests/unit/snapshot-artifacts.test.ts`).
+
+Release gates: `tests/unit/release-tools.test.ts` guards version drift, tag/version
+matching and SHA256 output. `scripts/release-gate.mjs` requires successful CI and
+installers on the exact candidate SHA. L3 shares the unit command; L7 is CI-only.
 
 ## Budgets and policy
 
