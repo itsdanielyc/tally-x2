@@ -48,6 +48,7 @@ function createWindow(): void {
 function start(): void {
   configureSession();
   const ledger = new LedgerService(new FileLedgerStore(join(app.getPath("userData"), "ledger.json")));
+  ipcMain.handle(channels.pickCsv, (event) => { assertSender(event); return null; });
   ipcMain.handle(channels.snapshot, (event) => { assertSender(event); return ledger.snapshot(); });
   ipcMain.handle(channels.execute, (event, command: unknown) => { assertSender(event); return ledger.execute(validateCommand(command)); });
   ipcMain.handle(channels.platformInfo, (event) => { assertSender(event); return platformInfo(); });

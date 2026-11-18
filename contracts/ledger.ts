@@ -1,3 +1,5 @@
+import type { CsvFile, CsvMapping } from "./csv";
+
 /** Currency codes supported by this single-currency, two-decimal ledger. */
 export const CURRENCIES = ["GBP", "EUR", "USD", "CAD", "AUD", "CHF"] as const;
 export const LEDGER_VERSION = 1;
@@ -29,6 +31,7 @@ export interface Ledger {
 export interface LedgerView { ledger: Ledger; canUndo: boolean }
 
 export type LedgerCommand =
+  | { type: "csv.import"; file: CsvFile; mapping: CsvMapping }
   | { type: "transaction.save"; transaction: TransactionDraft; id?: string }
   | { type: "transaction.delete"; id: string }
   | { type: "settings.currency"; currency: Currency };

@@ -9,8 +9,10 @@ import { greeting } from "../contracts/greet";
 import type { LedgerApi } from "../contracts/ledger";
 import { LedgerService } from "../backend/service";
 import { memoryStore } from "../backend/ports";
+import type { CsvFile } from "../contracts/csv";
 
 export interface Backend extends LedgerApi {
+  pickCsv(): Promise<CsvFile | null>;
   readonly kind: "native" | "mock";
   greet(name: string): Promise<string>;
   platformInfo(): Promise<PlatformInfo>;
@@ -27,6 +29,7 @@ const bridge = typeof window !== "undefined" ? window.electronBridge : undefined
 const mockLedger = new LedgerService(memoryStore());
 
 export const mock: Backend = {
+  pickCsv: async () => null,
   snapshot: () => mockLedger.snapshot(),
   execute: (command) => mockLedger.execute(command),
   kind: "mock",
@@ -42,6 +45,7 @@ export const mock: Backend = {
 export const backend: Backend = bridge
   ? {
       kind: "native",
+      pickCsv: () => bridge.pickCsv(),
       snapshot: () => bridge.snapshot(),
       execute: (command) => bridge.execute(command),
       greet: (name) => bridge.greet(name),

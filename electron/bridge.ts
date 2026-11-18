@@ -1,6 +1,7 @@
 // The typed surface the preload exposes to the renderer as window.electronBridge.
 // The renderer imports only these types; the preload and main implement them.
 import type { LedgerCommand, LedgerView } from "../contracts/ledger";
+import type { CsvFile } from "../contracts/csv";
 
 export type PlatformInfo = {
   /** process.platform in the main process: win32 | darwin | linux */
@@ -14,6 +15,7 @@ export type PlatformInfo = {
 };
 
 export interface ElectronBridge {
+  pickCsv(): Promise<CsvFile | null>;
   snapshot(): Promise<LedgerView>;
   execute(command: LedgerCommand): Promise<LedgerView>;
   greet(name: string): Promise<string>;
@@ -22,6 +24,7 @@ export interface ElectronBridge {
 
 /** IPC channel names, shared by main and preload. */
 export const channels = {
+  pickCsv: "csv:pick",
   snapshot: "ledger:snapshot",
   execute: "ledger:execute",
   greet: "app:greet",

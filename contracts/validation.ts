@@ -1,5 +1,6 @@
 import { LEDGER_VERSION, type Ledger, type LedgerCommand, type Transaction } from "./ledger";
 import { calendarDate, currencyValue, minorUnits, objectValue, textValue, transactionDraft } from "./primitives";
+import { csvFile, csvMapping } from "./csv";
 
 /** Parse each element, failing the entire file rather than silently dropping rows. */
 function arrayValue<T>(value: unknown, parse: (item: unknown) => T): T[] {
@@ -55,6 +56,7 @@ export function decodeLedger(value: unknown): Ledger {
 export function validateCommand(value: unknown): LedgerCommand {
   const command = objectValue(value);
   switch (command.type) {
+    case "csv.import": return { type: command.type, file: csvFile(command.file), mapping: csvMapping(command.mapping) };
     case "transaction.save": return {
       type: command.type, transaction: transactionDraft(command.transaction),
       ...(command.id === undefined ? {} : { id: textValue(command.id, "Transaction ID") }),
