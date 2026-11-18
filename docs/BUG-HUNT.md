@@ -13,8 +13,12 @@ Local reproduction: Windows x64, 2026-11-18 18:45:48 UTC. Source was unchanged.
 
 All listed regression tests pass locally. The combined focused CSV/import/export
 and post-commit suite (including the large real-file round trip) passed in 1.51s.
-The complete unit suite has 70 assertions. Final independent re-check and hosted
-candidate evidence remain separate gates in RELEASE-NOTES.md and VERIFICATION.md.
+The complete unit suite has 70 assertions. The same independent reader rechecked
+commit `2b09dd8fb716733da4089991d39218745ffe4697`: all three original reproductions
+now pass, including the 21,038,844-byte native-file round trip restoring all
+1,050 records exactly. They also passed 28 focused L1-L3 tests, four Chromium
+tests and 2,000 generated quoted-document/max-length Unicode parser checks.
+No new defect was found in the fixes. Hosted candidate proof remains a separate gate.
 
 The reader did not exercise dialogs, installers, physical power interruption or
 macOS/Linux runtime behavior. Post-rename failure was injected against real files.

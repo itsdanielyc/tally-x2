@@ -15,8 +15,9 @@ still a gate while those PRs are open.
 ## Pre-tag gates
 
 - [ ] Slices 0-5 have Tier 1 L0-L6 evidence and their fixed done conditions.
-- [ ] Empty and populated runner pixels are reviewed.
-- [ ] Independent defect hunt is complete; findings have red/green fixes or
+- [x] Empty and populated runner pixels are reviewed (18 captures, snapshots
+  run 44381416035; Windows, macOS and Linux, six states each).
+- [x] Independent defect hunt is complete; findings have red/green fixes or
   are named under Known defects.
 - [ ] Final CI is green on windows-x64, macos-arm64 and linux-x64.
 - [ ] Final NSIS, DMG, deb and AppImage installer round trips are green.
@@ -44,9 +45,10 @@ account, certificate, secret or payment was created or changed.
 
 ## Known defects
 
-The independent read found three defects; each has a red/green regression and
-local fix, recorded in [BUG-HUNT.md](BUG-HUNT.md). Final independent re-check and
-hosted proof are pending. No identified defect is intentionally deferred.
+The independent read found three defects. Each has a red/green regression and
+fix, and the independent re-check confirmed all three original reproductions now
+pass, with no new defect found in the fixes. See [BUG-HUNT.md](BUG-HUNT.md).
+No known defect from that review remains or is intentionally deferred.
 
 ## Limits and unverified work
 
